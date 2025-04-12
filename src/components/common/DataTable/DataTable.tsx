@@ -33,6 +33,7 @@ interface ReusableTableProps<T extends Record<string, unknown>> {
   initialSort?: SortConfig | null;
   initialFilters?: Record<string, string>;
   refetchRef?: React.MutableRefObject<(() => void) | undefined>;
+  children?: (props: { data: T[] }) => React.ReactNode;
 }
 
 const DataTable = <T extends Record<string, unknown>>({
@@ -42,17 +43,16 @@ const DataTable = <T extends Record<string, unknown>>({
   initialSort = null,
   initialFilters = {},
   refetchRef,
+  children, // Explicitly destructure children
 }: ReusableTableProps<T>) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(initialSort);
   const [filters] = useState<Record<string, string>>(initialFilters);
   const [data, setData] = useState<T[]>([]);
   const [totalItems, setTotalItems] = useState<number>(0);
-  // const [loading, setLoading] = useState<boolean>(false); // Added loading state
 
   const loadData = useCallback(
     async (params: Partial<QueryParams>): Promise<void> => {
-      // setLoading(true);
       try {
         const queryParams: QueryParams = {
           page: params.page || currentPage,
@@ -149,6 +149,8 @@ const DataTable = <T extends Record<string, unknown>>({
           ))}
         </tbody>
       </table>
+
+      {children && children({ data })}
 
       <Pagination
         currentPage={currentPage}
