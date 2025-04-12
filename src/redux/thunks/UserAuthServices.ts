@@ -5,6 +5,7 @@ import { AxiosError } from "axios";
 export interface LoginData {
   email: string;
   password: string;
+  role: string;
 }
 
 export const login = createAsyncThunk(

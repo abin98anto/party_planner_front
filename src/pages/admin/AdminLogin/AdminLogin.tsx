@@ -1,90 +1,79 @@
-import React, { useState } from 'react';
-import './AdminLogin.scss';
-
-interface LoginForm {
-  email: string;
-  password: string;
-}
-
-interface FormErrors {
-  email?: string;
-  password?: string;
-}
+import React, { useState } from "react";
+import "./AdminLogin.scss";
+import { useAppDispatch } from "../../../hooks/reduxHooks";
+import { useNavigate } from "react-router-dom";
+import { login } from "../../../redux/thunks/UserAuthServices";
 
 const AdminLogin: React.FC = () => {
-  const [formData, setFormData] = useState<LoginForm>({ email: '', password: '' });
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
+    {}
+  );
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
-  const validateForm = (): FormErrors => {
-    const newErrors: FormErrors = {};
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const validateForm = () => {
+    const newErrors: { email?: string; password?: string } = {};
 
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = 'Invalid email format';
+    // Email validation
+    if (!email) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Please enter a valid email address";
     }
 
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
+    // Password validation
+    if (!password) {
+      newErrors.password = "Password is required";
+    } else if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters long";
     }
 
-    return newErrors;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+  const resetForm = () => {
+    setEmail("");
+    setPassword("");
+    setErrors({});
+    setErrors({});
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    
-    // Clear error when user starts typing
-    if (errors[name as keyof FormErrors]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>): void => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
-    const validationErrors = validateForm();
+    if (validateForm()) {
+      const response = await dispatch(
+        login({ email, password, role: "admin" })
+      ).unwrap();
 
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      setIsSubmitting(false);
-      return;
+      if (response.success === true) {
+        navigate("/admin/dashboard");
+        resetForm();
+      }
     }
-
-    // Simulate API call
-    setTimeout(() => {
-      console.log('Login attempt:', formData);
-      setIsSubmitting(false);
-      // Reset form after successful submission
-      setFormData({ email: '', password: '' });
-      alert('Login successful!');
-    }, 1000);
   };
 
   return (
     <div className="login-container">
       <div className="login-card">
         <h2 className="login-title">Admin Login</h2>
-        <div className="login-form">
+        <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
             <label htmlFor="email">Email</label>
             <input
-              type="email"
+              type="text"
               id="email"
               name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              className={errors.email ? 'input-error' : ''}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={errors.email ? "input-error" : ""}
               placeholder="Enter your email"
-              disabled={isSubmitting}
             />
-            {errors.email && <span className="error-message">{errors.email}</span>}
+            {errors.email && (
+              <span className="error-message">{errors.email}</span>
+            )}
           </div>
 
           <div className="form-group">
@@ -93,23 +82,20 @@ const AdminLogin: React.FC = () => {
               type="password"
               id="password"
               name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              className={errors.password ? 'input-error' : ''}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={errors.password ? "input-error" : ""}
               placeholder="Enter your password"
-              disabled={isSubmitting}
             />
-            {errors.password && <span className="error-message">{errors.password}</span>}
+            {errors.password && (
+              <span className="error-message">{errors.password}</span>
+            )}
           </div>
 
-          <button
-            onClick={handleSubmit}
-            className="login-button"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Logging in...' : 'Login'}
+          <button type="submit" className="login-button">
+            Login
           </button>
-        </div>
+        </form>
       </div>
     </div>
   );

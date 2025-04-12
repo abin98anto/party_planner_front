@@ -42,7 +42,9 @@ const UserLogin: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      const response = await dispatch(login({ email, password })).unwrap();
+      const response = await dispatch(
+        login({ email, password, role: "user" })
+      ).unwrap();
 
       if (response.success === true) {
         navigate("/");
