@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { BarChart2, BookOpen, Layers, Users, SquareStack } from "lucide-react";
+import { BarChart2, BookOpen, Layers, SquareStack } from "lucide-react";
 
 import "./AdminSidebar.scss";
 import { useAppDispatch } from "../../../hooks/reduxHooks";
@@ -23,7 +23,6 @@ const menuItems = [
     icon: Layers,
     path: "/admin/order-management",
   },
-  { title: "User Management", icon: Users, path: "/admin/user-management" },
 ];
 
 const AdminSidebar = () => {
@@ -67,7 +66,10 @@ const AdminSidebar = () => {
       <div className="admin-sidebar-footer">
         <button
           className="admin-sign-out-button"
-          onClick={async () => await dispatch(logout()).unwrap()}
+          onClick={async () => {
+            await dispatch(logout()).unwrap();
+            navigate("/admin/");
+          }}
         >
           Logout
         </button>
