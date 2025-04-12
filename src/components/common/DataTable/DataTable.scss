@@ -1,0 +1,144 @@
+.table-container {
+  color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 100%;
+}
+
+.table-controls {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .search-container {
+    display: flex;
+    gap: 10px;
+
+    .search-input {
+      padding: 8px 12px;
+      border: 1px solid #333;
+      border-radius: 4px;
+      background-color: #2c2c2c;
+      color: #ffffff;
+      font-size: 14px;
+      width: 200px;
+
+      &:focus {
+        outline: none;
+        border-color: #007bff;
+      }
+    }
+
+    .search-button {
+      padding: 8px 16px;
+      background-color: #ff4500;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+
+      &:hover {
+        background-color: #e63e00;
+      }
+    }
+  }
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #2c2c2c;
+  color: #ffffff;
+  font-size: 16px;
+
+  th,
+  td {
+    padding: 12px 16px;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid #444;
+  }
+
+  th {
+    background-color: #353434;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .column-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+
+    .sort-button {
+      background: none;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0;
+      position: absolute;
+      right: 8px;
+
+      &:hover {
+        color: #007bff;
+      }
+    }
+  }
+
+  td {
+    .status {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      display: inline-block;
+
+      &.active {
+        background-color: #28a745;
+        color: #ffffff;
+      }
+
+      &.inactive {
+        background-color: #dc3545;
+        color: #ffffff;
+      }
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+
+      button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+          color: #007bff;
+        }
+
+        &.edit {
+          color: #28a745;
+        }
+
+        &.delete {
+          color: #dc3545;
+        }
+      }
+    }
+  }
+}
