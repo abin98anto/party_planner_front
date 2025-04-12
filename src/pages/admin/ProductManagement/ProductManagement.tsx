@@ -1,7 +1,5 @@
 import { Plus } from "lucide-react";
 
-// import DataTable from "../../../components/common/DataTable/DataTable";
-
 const ProductManagement = () => {
   return (
     <div className="course-management">
@@ -11,14 +9,6 @@ const ProductManagement = () => {
           <Plus size={16} />
           Add Course
         </button>
-
-        {/* <DataTable
-          columns={columns as Column<Record<string, any>>[]}
-          fetchData={fetchTableData}
-          pageSize={10}
-          initialSort={{ field: "title", order: "asc" }}
-          refetchRef={refetchData}
-        /> */}
       </div>
     </div>
   );
