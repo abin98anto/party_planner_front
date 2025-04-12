@@ -48,9 +48,7 @@ const ProductManagement: React.FC = () => {
 
   const fetchProducts = async (): Promise<void> => {
     try {
-      console.log("fetchingng products");
       const response = await axiosInstance.get("/product");
-      console.log("the respones", response);
       const data: IProduct[] = await response.data.data;
       setProducts(data);
     } catch (error) {
@@ -62,7 +60,6 @@ const ProductManagement: React.FC = () => {
     try {
       const response = await axiosInstance.get("/category");
       const data: ICategory[] = await response.data.data;
-      console.log("the cats", data);
       setCategories(data.filter((category) => category.isActive));
     } catch (error) {
       console.error("Error fetching categories:", error);
