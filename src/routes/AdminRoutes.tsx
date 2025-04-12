@@ -10,8 +10,8 @@ import OrderManagement from "../pages/admin/OrderManagement/OrderManagement";
 const AdminRoutes = () => {
   return (
     <Routes>
+      <Route path="/" element={<AdminLogin />} />
       <Route element={<AdminLayout />}>
-        <Route path="/" element={<AdminLogin />} />
         <Route path="/dashboard" element={<AdminDashboard />} />
         <Route path="/category-management" element={<CategoryManagement />} />
         <Route path="/product-management" element={<ProductManagement />} />
