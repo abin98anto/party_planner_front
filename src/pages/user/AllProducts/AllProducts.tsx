@@ -57,6 +57,11 @@ const AllProducts = () => {
         params,
       });
 
+      const hey = response.data.data.map((prod: IProductNew) => {
+        return prod.providerId.locations;
+      });
+      console.log("the loco", hey);
+
       if (response.data.success) {
         setProducts(response.data.data);
         setPagination({
@@ -86,24 +91,20 @@ const AllProducts = () => {
     }
   };
 
-  // Initial data load
   useEffect(() => {
     fetchProducts();
     fetchFilterOptions();
   }, []);
 
-  // Handle search
   const handleSearch = (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    fetchProducts(1); // Reset to first page when searching
+    fetchProducts(1);
   };
 
-  // Handle filter changes
   const handleFilterChange = () => {
-    fetchProducts(1); // Reset to first page when filters change
+    fetchProducts(1);
   };
 
-  // Reset all filters
   const resetFilters = () => {
     setSearchTerm("");
     setMinPrice("");
@@ -115,19 +116,16 @@ const AllProducts = () => {
     fetchProducts(1);
   };
 
-  // Pagination handlers
   const handlePageChange = (newPage: number | undefined) => {
     if (newPage! >= 1 && newPage! <= pagination.totalPages) {
       fetchProducts(newPage);
     }
   };
 
-  // Generate page numbers for pagination
   const getPageNumbers = () => {
     const pageNumbers = [];
     const { currentPage, totalPages } = pagination;
 
-    // Show max 5 page numbers with current page in the middle when possible
     const startPage = Math.max(1, currentPage - 2);
     const endPage = Math.min(totalPages, startPage + 4);
 

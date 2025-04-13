@@ -8,6 +8,7 @@ import ProductManagement from "../pages/admin/ProductManagement/ProductManagemen
 import OrderManagement from "../pages/admin/OrderManagement/OrderManagement";
 import ProviderManagement from "../pages/admin/ProviderManagement/ProviderManagement";
 import AddProduct from "../pages/admin/ProductManagement/AddProduct/AddProduct";
+import LocationManagement from "../pages/admin/LocationManagement/LoacationManagement";
 
 const AdminRoutes = () => {
   return (
@@ -16,6 +17,7 @@ const AdminRoutes = () => {
       <Route element={<AdminLayout />}>
         <Route path="/dashboard" element={<AdminDashboard />} />
         <Route path="/category-management" element={<CategoryManagement />} />
+        <Route path="/location-management" element={<LocationManagement />} />
         <Route path="/product-management" element={<ProductManagement />} />
         <Route path="/add-product" element={<AddProduct />} />
         <Route path="/edit-product/:productId" element={<AddProduct />} />
