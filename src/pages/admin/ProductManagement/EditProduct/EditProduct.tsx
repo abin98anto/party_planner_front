@@ -8,20 +8,20 @@ import handleFileUpload, {
 import type ICategory from "../../../../entities/ICategory";
 import type IProvider from "../../../../entities/IProvider";
 import type IProduct from "../../../../entities/IProduct";
-import Calendar from "./calender";
+import Calendar from "../AddProduct/calender";
 import "./AddProduct.scss";
 
-const AddProduct: React.FC = () => {
+const EditProduct: React.FC = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [providers, setProviders] = useState<IProvider[]>([]);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
-  const isEditMode = !!productId;
 
-  // Product form state
   const [productForm, setProductForm] = useState<
     IProduct & { providerId?: string }
   >({
@@ -36,14 +36,26 @@ const AddProduct: React.FC = () => {
   });
 
   useEffect(() => {
-    fetchCategories();
-    fetchProviders();
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
 
-    if (productId) {
-      fetchProductDetails(productId);
-    }
+      try {
+        await Promise.all([
+          fetchCategories(),
+          fetchProviders(),
+          fetchProductDetails(),
+        ]);
+      } catch (err) {
+        setError("Failed to load product data. Please try again.");
+        console.error("Error loading data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    // Close calendar when clicking outside
+    fetchData();
+
     const handleClickOutside = (event: MouseEvent) => {
       if (
         calendarRef.current &&
@@ -59,16 +71,28 @@ const AddProduct: React.FC = () => {
     };
   }, [productId]);
 
-  const fetchProductDetails = async (id: string): Promise<void> => {
+  const fetchProductDetails = async (): Promise<void> => {
+    if (!productId) {
+      setError("Product ID is missing");
+      return;
+    }
+
     try {
-      const response = await axiosInstance.get(`/product/${id}`);
+      const response = await axiosInstance.get(`/product/${productId}`);
       const productData = response.data.data;
+
+      const formattedDates = productData.datesAvailable.map(
+        (date: string | Date) => new Date(date)
+      );
+
       setProductForm({
         ...productData,
-        providerId: productData.providerId || "", // Add provider ID if it exists
+        datesAvailable: formattedDates,
+        providerId: productData.providerId || "",
       });
     } catch (error) {
       console.error("Error fetching product details:", error);
+      throw error;
     }
   };
 
@@ -79,6 +103,7 @@ const AddProduct: React.FC = () => {
       setCategories(data.filter((category) => category.isActive));
     } catch (error) {
       console.error("Error fetching categories:", error);
+      throw error;
     }
   };
 
@@ -89,6 +114,7 @@ const AddProduct: React.FC = () => {
       setProviders(data.filter((provider) => provider.isActive));
     } catch (error) {
       console.error("Error fetching providers:", error);
+      throw error;
     }
   };
 
@@ -174,37 +200,61 @@ const AddProduct: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
+
+    if (!productId) {
+      setError("Product ID is missing");
+      return;
+    }
+
     try {
-      // Create a copy of productForm to submit
       const productData = { ...productForm };
 
-      // If we're in edit mode
-      if (isEditMode) {
-        const response = await axiosInstance.put(
-          "/product/update",
-          productData
-        );
-        if (response.status === 200) {
-          navigate("/admin/product-management");
-        }
-      } else {
-        const response = await axiosInstance.post("/product/add", productData);
-        if (response.status === 201) {
-          navigate("/admin/product-management");
-        }
+      const response = await axiosInstance.put("/product/update", productData);
+
+      if (response.status === 200) {
+        navigate("/admin/product-management");
       }
     } catch (error) {
-      console.error("Error saving product:", error);
+      console.error("Error updating product:", error);
+      setError("Failed to update product. Please try again.");
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="add-product">
+        <div className="container">
+          <div className="form-container">
+            <div className="loading-indicator">Loading product data...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="add-product">
+        <div className="container">
+          <div className="form-container">
+            <div className="error-message">{error}</div>
+            <button
+              className="cancel-button"
+              onClick={() => navigate("/admin/product-management")}
+            >
+              Back to Products
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="add-product">
       <div className="container">
         <div className="form-container">
-          <h1 className="form-title centered">
-            {isEditMode ? "Edit Product" : "Add New Product"}
-          </h1>
+          <h1 className="form-title centered">Edit Product</h1>
 
           <form className="form-content" onSubmit={handleSubmit}>
             <div className="form-row full-width">
@@ -383,12 +433,12 @@ const AddProduct: React.FC = () => {
                 <button
                   type="button"
                   className="cancel-button"
-                  onClick={() => navigate("/product-management")}
+                  onClick={() => navigate("/admin/product-management")}
                 >
                   Cancel
                 </button>
                 <button type="submit" className="submit-button">
-                  {isEditMode ? "Update Product" : "Add Product"}
+                  Update Product
                 </button>
               </div>
             </div>
@@ -399,4 +449,4 @@ const AddProduct: React.FC = () => {
   );
 };
 
-export default AddProduct;
+export default EditProduct;

@@ -75,7 +75,7 @@ const ProductManagement: React.FC = () => {
   };
 
   const openEditModal = (product: IProduct): void => {
-    navigate(`/add-product/${product._id}`);
+    navigate(`/admin/edit-product/${product._id}`);
   };
 
   const openDeleteModal = (product: IProduct): void => {

@@ -1,13 +1,35 @@
 .add-product {
   padding: 2rem 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  color: #333;
+  background-color: #1a1a1a; /* Change to black shade */
+  min-height: 100vh;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
 
   .form-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     padding: 2rem;
   }
 
   .form-title {
     margin-bottom: 2rem;
     font-weight: 600;
+    font-size: 1.75rem;
+    color: #2c3e50;
+    border-bottom: 2px solid #f0f2f5;
+    padding-bottom: 1rem;
+
+    &.centered {
+      text-align: center;
+    }
   }
 
   .form-content {
@@ -30,24 +52,99 @@
       > * {
         flex: 1;
       }
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+      }
+    }
+
+    &.three-col {
+      width: 100%;
+
+      > * {
+        flex: 1;
+      }
+
+      @media (max-width: 992px) {
+        flex-direction: column;
+      }
     }
   }
 
   .form-field {
     width: 100%;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #4a5568;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+
+      &:focus {
+        outline: none;
+        border-color: #3182ce;
+        box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
+      }
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px; /* Reduced from 100px */
+      max-height: 150px;
+    }
+
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 16px;
+      padding-right: 2.5rem;
+    }
   }
 
   .section-container {
     width: 100%;
+    margin-top: 1rem;
   }
 
   .section-title {
     margin-bottom: 1rem;
     font-weight: 500;
+    font-size: 1.25rem;
+    color: #2c3e50;
   }
 
   .upload-button {
+    padding: 0.75rem 1.5rem;
+    background-color: #4299e1;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
     margin-bottom: 1rem;
+
+    &:hover {
+      background-color: #3182ce;
+    }
+
+    &:disabled {
+      background-color: #a0aec0;
+      cursor: not-allowed;
+    }
   }
 
   .image-preview-container {
@@ -61,9 +158,10 @@
     position: relative;
     width: 150px;
     height: 150px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
     overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   }
 
   .image-preview {
@@ -76,28 +174,71 @@
     position: absolute;
     top: 5px;
     right: 5px;
-    min-width: 30px;
     width: 30px;
     height: 30px;
-    padding: 0;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: none;
+    font-size: 1.25rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #e53e3e;
+
+    &:hover {
+      background-color: #fff;
+      color: #c53030;
+    }
   }
 
   .date-picker-container {
-    display: flex;
-    gap: 1rem;
+    position: relative;
     margin-bottom: 1rem;
-    align-items: center;
   }
 
-  .date-picker {
-    flex: 1;
-    max-width: 200px;
+  .calendar-toggle-button {
+    padding: 0.75rem 1.5rem;
+    background-color: #4299e1;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #3182ce;
+    }
+  }
+
+  .calendar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9;
+  }
+
+  .calendar-modal-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    background-color: white;
   }
 
   .date-chips-container {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
+    margin-top: 1rem;
   }
 
   .date-chip {
@@ -105,21 +246,69 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background-color: #f0f0f0;
+    background-color: #ebf4ff;
     border-radius: 16px;
+    font-size: 0.875rem;
+    color: #3182ce;
   }
 
   .date-remove-btn {
-    min-width: 24px;
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: none;
+    font-size: 1rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #3182ce;
     padding: 0;
+
+    &:hover {
+      background-color: #fff;
+      color: #2c5282;
+    }
   }
 
   .form-actions {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
-    margin-top: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .cancel-button,
+  .submit-button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .cancel-button {
+    background-color: white;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
+
+    &:hover {
+      background-color: #f7fafc;
+      border-color: #cbd5e0;
+    }
+  }
+
+  .submit-button {
+    background-color: #38a169;
+    color: white;
+    border: none;
+
+    &:hover {
+      background-color: #2f855a;
+    }
   }
 }
