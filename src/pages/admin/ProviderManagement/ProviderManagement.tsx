@@ -3,6 +3,7 @@ import { Modal, Box, Typography, TextField, Button } from "@mui/material";
 import "./ProviderManagement.scss";
 import { axiosInstance } from "../../../config/axiosConfig";
 import IProvider from "../../../entities/IProvider";
+import ILocation from "../../../entities/ILocation";
 
 const ProviderManagement: React.FC = () => {
   const [providers, setProviders] = useState<IProvider[]>([]);
@@ -13,22 +14,28 @@ const ProviderManagement: React.FC = () => {
   const [name, setName] = useState<string>("");
   const [company, setCompany] = useState<string>("");
   const [contact, setContact] = useState<number | string>("");
-  const [locations, setLocations] = useState<string>("");
   const [locationError, setLocationError] = useState<string>("");
   const [selectedProvider, setSelectedProvider] = useState<IProvider | null>(
     null
   );
-  const validateLocations = (): boolean => {
-    if (!locations.trim()) {
-      setLocationError("At least one location is required");
-      return false;
+  const [availableLocations, setAvailableLocations] = useState<ILocation[]>([]);
+  const [selectedLocations, setSelectedLocations] = useState<ILocation[]>([]);
+
+  const fetchLocations = async (): Promise<void> => {
+    try {
+      const response = await axiosInstance.get("/location");
+      const data: ILocation[] = await response.data.data;
+      setAvailableLocations(
+        data.filter((loc) => loc.isActive && !loc.isDeleted)
+      );
+    } catch (error) {
+      console.error("Error fetching locations:", error);
     }
-    setLocationError("");
-    return true;
   };
 
   useEffect(() => {
     fetchProviders();
+    fetchLocations();
   }, []);
 
   const fetchProviders = async (): Promise<void> => {
@@ -38,63 +45,6 @@ const ProviderManagement: React.FC = () => {
       setProviders(data);
     } catch (error) {
       console.error("Error fetching providers:", error);
-    }
-  };
-
-  const handleAddProvider = async (): Promise<void> => {
-    try {
-      if (!validateLocations()) {
-        return;
-      }
-
-      const locationArray = locations
-        .split(",")
-        .map((loc) => loc.trim())
-        .filter((loc) => loc !== "");
-
-      const response = await axiosInstance.post("/provider/add", {
-        name,
-        company,
-        contact: Number(contact),
-        locations: locationArray,
-      });
-      if (response) {
-        setIsAddModalOpen(false);
-        resetForm();
-        fetchProviders();
-      }
-    } catch (error) {
-      console.error("Error adding provider:", error);
-    }
-  };
-
-  const handleEditProvider = async (): Promise<void> => {
-    try {
-      if (!validateLocations()) {
-        return;
-      }
-
-      const locationArray = locations
-        .split(",")
-        .map((loc) => loc.trim())
-        .filter((loc) => loc !== "");
-
-      const response = await axiosInstance.put("/provider/update", {
-        _id: selectedProvider?._id,
-        name,
-        company,
-        contact: Number(contact),
-        locations: locationArray,
-      });
-
-      if (response.status === 200) {
-        setIsEditModalOpen(false);
-        setSelectedProvider(null);
-        resetForm();
-        fetchProviders();
-      }
-    } catch (error) {
-      console.error("Error updating provider:", error);
     }
   };
 
@@ -117,7 +67,6 @@ const ProviderManagement: React.FC = () => {
 
   const handleToggleListStatus = async (): Promise<void> => {
     try {
-      // Toggle the isActive status
       const newActiveStatus =
         selectedProvider?.isActive === true ? false : true;
 
@@ -140,7 +89,7 @@ const ProviderManagement: React.FC = () => {
     setName("");
     setCompany("");
     setContact("");
-    setLocations("");
+    setSelectedLocations([]);
     setLocationError("");
   };
 
@@ -149,7 +98,7 @@ const ProviderManagement: React.FC = () => {
     setName(provider.name);
     setCompany(provider.company);
     setContact(provider.contact);
-    setLocations(provider.locations.join(","));
+    setSelectedLocations(provider.locations);
     setIsEditModalOpen(true);
   };
 
@@ -161,6 +110,73 @@ const ProviderManagement: React.FC = () => {
   const openListModal = (provider: IProvider): void => {
     setSelectedProvider(provider);
     setIsListModalOpen(true);
+  };
+
+  const handleAddProvider = async (): Promise<void> => {
+    try {
+      if (selectedLocations.length === 0) {
+        setLocationError("At least one location is required");
+        return;
+      }
+
+      const response = await axiosInstance.post("/provider/add", {
+        name,
+        company,
+        contact: Number(contact),
+        locations: selectedLocations,
+      });
+      if (response) {
+        setIsAddModalOpen(false);
+        resetForm();
+        fetchProviders();
+      }
+    } catch (error) {
+      console.error("Error adding provider:", error);
+    }
+  };
+
+  const handleEditProvider = async (): Promise<void> => {
+    try {
+      if (selectedLocations.length === 0) {
+        setLocationError("At least one location is required");
+        return;
+      }
+
+      const response = await axiosInstance.put("/provider/update", {
+        _id: selectedProvider?._id,
+        name,
+        company,
+        contact: Number(contact),
+        locations: selectedLocations,
+      });
+
+      if (response.status === 200) {
+        setIsEditModalOpen(false);
+        setSelectedProvider(null);
+        resetForm();
+        fetchProviders();
+      }
+    } catch (error) {
+      console.error("Error updating provider:", error);
+    }
+  };
+
+  const handleLocationChange = (location: ILocation): void => {
+    setSelectedLocations((prevSelected) => {
+      const isAlreadySelected = prevSelected.some(
+        (loc) => loc._id === location._id
+      );
+
+      if (isAlreadySelected) {
+        return prevSelected.filter((loc) => loc._id !== location._id);
+      } else {
+        return [...prevSelected, location];
+      }
+    });
+
+    if (locationError && selectedLocations.length > 0) {
+      setLocationError("");
+    }
   };
 
   const modalStyle = {
@@ -220,14 +236,16 @@ const ProviderManagement: React.FC = () => {
                     <td>
                       {provider.locations && provider.locations.length > 0 ? (
                         <div className="location-tags">
-                          {provider.locations.map((location, index) => (
-                            <span key={index} className="location-tag">
-                              {location}
-                              {index < provider.locations.length - 1
-                                ? ", "
-                                : ""}
-                            </span>
-                          ))}
+                          {provider.locations.map(
+                            (location: ILocation, index) => (
+                              <span key={index} className="location-tag">
+                                {location.name}
+                                {index < provider.locations.length - 1
+                                  ? ", "
+                                  : ""}
+                              </span>
+                            )
+                          )}
                         </div>
                       ) : (
                         "No locations"
@@ -334,21 +352,49 @@ const ProviderManagement: React.FC = () => {
             }}
           />
           {/* <LocationInputField /> */}
-          <TextField
-            fullWidth
-            label="Locations (comma separated)*"
-            value={locations}
-            onChange={(e) => setLocations(e.target.value)}
-            margin="normal"
-            error={!!locationError}
-            helperText={locationError || "Enter locations separated by commas"}
-            InputLabelProps={{
-              style: { color: "#aaa" },
+          <Typography variant="subtitle1" sx={{ mt: 2, mb: 1, color: "#aaa" }}>
+            Locations*
+          </Typography>
+          {locationError && (
+            <Typography color="error" variant="caption">
+              {locationError}
+            </Typography>
+          )}
+          <Box
+            sx={{
+              maxHeight: "150px",
+              overflowY: "auto",
+              border: locationError ? "1px solid #f44336" : "1px solid #555",
+              borderRadius: 1,
+              p: 1,
             }}
-            InputProps={{
-              style: { color: "white" },
-            }}
-          />
+          >
+            {availableLocations.length > 0 ? (
+              availableLocations.map((location) => (
+                <Box
+                  key={location._id}
+                  sx={{ display: "flex", alignItems: "center", mb: 1 }}
+                >
+                  <input
+                    type="checkbox"
+                    id={`location-${location._id}`}
+                    checked={selectedLocations.some(
+                      (loc) => loc._id === location._id
+                    )}
+                    onChange={() => handleLocationChange(location)}
+                    style={{ marginRight: "8px" }}
+                  />
+                  <label htmlFor={`location-${location._id}`}>
+                    {location.name}
+                  </label>
+                </Box>
+              ))
+            ) : (
+              <Typography variant="body2" sx={{ color: "#888" }}>
+                No locations available
+              </Typography>
+            )}
+          </Box>
           <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
             <Button
               onClick={() => setIsAddModalOpen(false)}
@@ -418,21 +464,49 @@ const ProviderManagement: React.FC = () => {
               style: { color: "white" },
             }}
           />
-          <TextField
-            fullWidth
-            label="Locations (comma separated)*"
-            value={locations.split(",")}
-            onChange={(e) => setLocations(e.target.value)}
-            margin="normal"
-            error={!!locationError}
-            helperText={locationError || "Enter locations separated by commas"}
-            InputLabelProps={{
-              style: { color: "#aaa" },
+          <Typography variant="subtitle1" sx={{ mt: 2, mb: 1, color: "#aaa" }}>
+            Locations*
+          </Typography>
+          {locationError && (
+            <Typography color="error" variant="caption">
+              {locationError}
+            </Typography>
+          )}
+          <Box
+            sx={{
+              maxHeight: "150px",
+              overflowY: "auto",
+              border: locationError ? "1px solid #f44336" : "1px solid #555",
+              borderRadius: 1,
+              p: 1,
             }}
-            InputProps={{
-              style: { color: "white" },
-            }}
-          />
+          >
+            {availableLocations.length > 0 ? (
+              availableLocations.map((location) => (
+                <Box
+                  key={location._id}
+                  sx={{ display: "flex", alignItems: "center", mb: 1 }}
+                >
+                  <input
+                    type="checkbox"
+                    id={`location-${location._id}`}
+                    checked={selectedLocations.some(
+                      (loc) => loc._id === location._id
+                    )}
+                    onChange={() => handleLocationChange(location)}
+                    style={{ marginRight: "8px" }}
+                  />
+                  <label htmlFor={`location-${location._id}`}>
+                    {location.name}
+                  </label>
+                </Box>
+              ))
+            ) : (
+              <Typography variant="body2" sx={{ color: "#888" }}>
+                No locations available
+              </Typography>
+            )}
+          </Box>
           <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
             <Button
               onClick={() => setIsEditModalOpen(false)}
