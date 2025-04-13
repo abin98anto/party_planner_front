@@ -9,6 +9,9 @@ const Header: React.FC = () => {
   const goToLogin = () => {
     navigate("/login");
   };
+  const goToProducts = () => {
+    navigate("/products");
+  };
 
   return (
     <header className="user-header">
@@ -21,7 +24,9 @@ const Header: React.FC = () => {
           <div>
             <Stack spacing={2} direction="row">
               <Button variant="text">Home</Button>
-              <Button variant="text">Products</Button>
+              <Button variant="text" onClick={goToProducts}>
+                Products
+              </Button>
               <Button variant="outlined" onClick={goToLogin}>
                 Login
               </Button>
