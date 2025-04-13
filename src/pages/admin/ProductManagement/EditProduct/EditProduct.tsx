@@ -69,7 +69,7 @@ const EditProduct: React.FC = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [productId]);
+  });
 
   const fetchProductDetails = async (): Promise<void> => {
     if (!productId) {
