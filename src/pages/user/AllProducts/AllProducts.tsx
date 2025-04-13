@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import "./AllProducts.scss";
 import ICategory from "../../../entities/ICategory";
 import IProvider from "../../../entities/IProvider";
 import { axiosInstance } from "../../../config/axiosConfig";
+import ILocation from "../../../entities/ILocation";
 
 interface IProductNew {
   _id?: string;
@@ -57,11 +57,6 @@ const AllProducts = () => {
         params,
       });
 
-      const hey = response.data.data.map((prod: IProductNew) => {
-        return prod.providerId.locations;
-      });
-      console.log("the loco", hey);
-
       if (response.data.success) {
         setProducts(response.data.data);
         setPagination({
@@ -84,7 +79,7 @@ const AllProducts = () => {
       const categoriesResponse = await axiosInstance.get("/category");
       setCategories(categoriesResponse.data.data || []);
 
-      const locationsResponse = await axios.get("/api/locations");
+      const locationsResponse = await axiosInstance.get("/location");
       setLocations(locationsResponse.data.data || []);
     } catch (err) {
       console.error("Error fetching filter options:", err);
@@ -181,9 +176,9 @@ const AllProducts = () => {
               }}
             >
               <option value="">All Locations</option>
-              {locations.map((location, index) => (
-                <option key={index} value={index}>
-                  {location}
+              {locations.map((location: ILocation) => (
+                <option key={location._id} value={location._id}>
+                  {location.name}
                 </option>
               ))}
             </select>
