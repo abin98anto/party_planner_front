@@ -7,6 +7,7 @@ import CategoryManagement from "../pages/admin/CategoryManagement/CategoryManage
 import ProductManagement from "../pages/admin/ProductManagement/ProductManagement";
 import OrderManagement from "../pages/admin/OrderManagement/OrderManagement";
 import ProviderManagement from "../pages/admin/ProviderManagement/ProviderManagement";
+import AddProduct from "../pages/admin/ProductManagement/AddProduct/AddProduct";
 
 const AdminRoutes = () => {
   return (
@@ -16,6 +17,7 @@ const AdminRoutes = () => {
         <Route path="/dashboard" element={<AdminDashboard />} />
         <Route path="/category-management" element={<CategoryManagement />} />
         <Route path="/product-management" element={<ProductManagement />} />
+        <Route path="/add-product" element={<AddProduct />} />
         <Route path="/order-management" element={<OrderManagement />} />
         <Route path="/provider-management" element={<ProviderManagement />} />
         <Route path="*" element={<NotFound />} />

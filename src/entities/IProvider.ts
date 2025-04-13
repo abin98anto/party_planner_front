@@ -3,6 +3,7 @@ export default interface IProvider {
   name: string;
   company: string;
   contact: number;
+  locations: string[];
   isActive: boolean;
   isDeleted: boolean;
   createdAt: Date;

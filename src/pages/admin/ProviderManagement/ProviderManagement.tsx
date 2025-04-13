@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Box, Typography, TextField, Button } from "@mui/material";
+import {
+  Modal,
+  Box,
+  Typography,
+  TextField,
+  Button,
+} from "@mui/material";
 import "./ProviderManagement.scss";
 import { axiosInstance } from "../../../config/axiosConfig";
 import IProvider from "../../../entities/IProvider";
@@ -13,9 +19,19 @@ const ProviderManagement: React.FC = () => {
   const [name, setName] = useState<string>("");
   const [company, setCompany] = useState<string>("");
   const [contact, setContact] = useState<number | string>("");
+  const [locations, setLocations] = useState<string>("");
+  const [locationError, setLocationError] = useState<string>("");
   const [selectedProvider, setSelectedProvider] = useState<IProvider | null>(
     null
   );
+  const validateLocations = (): boolean => {
+    if (!locations.trim()) {
+      setLocationError("At least one location is required");
+      return false;
+    }
+    setLocationError("");
+    return true;
+  };
 
   useEffect(() => {
     fetchProviders();
@@ -33,10 +49,20 @@ const ProviderManagement: React.FC = () => {
 
   const handleAddProvider = async (): Promise<void> => {
     try {
+      if (!validateLocations()) {
+        return;
+      }
+
+      const locationArray = locations
+        .split(",")
+        .map((loc) => loc.trim())
+        .filter((loc) => loc !== "");
+
       const response = await axiosInstance.post("/provider/add", {
         name,
         company,
         contact: Number(contact),
+        locations: locationArray,
       });
       if (response) {
         setIsAddModalOpen(false);
@@ -50,11 +76,21 @@ const ProviderManagement: React.FC = () => {
 
   const handleEditProvider = async (): Promise<void> => {
     try {
+      if (!validateLocations()) {
+        return;
+      }
+
+      const locationArray = locations
+        .split(",")
+        .map((loc) => loc.trim())
+        .filter((loc) => loc !== "");
+
       const response = await axiosInstance.put("/provider/update", {
         _id: selectedProvider?._id,
         name,
         company,
         contact: Number(contact),
+        locations: locationArray,
       });
 
       if (response.status === 200) {
@@ -110,6 +146,8 @@ const ProviderManagement: React.FC = () => {
     setName("");
     setCompany("");
     setContact("");
+    setLocations("");
+    setLocationError("");
   };
 
   const openEditModal = (provider: IProvider): void => {
@@ -129,6 +167,7 @@ const ProviderManagement: React.FC = () => {
     setSelectedProvider(provider);
     setIsListModalOpen(true);
   };
+
 
   const modalStyle = {
     position: "absolute",
@@ -172,6 +211,7 @@ const ProviderManagement: React.FC = () => {
                   <th>Name</th>
                   <th>Company</th>
                   <th>Contact</th>
+                  <th>Locations</th>
                   <th>Status</th>
                   <th>Created At</th>
                   <th>Actions</th>
@@ -183,6 +223,22 @@ const ProviderManagement: React.FC = () => {
                     <td>{provider.name}</td>
                     <td>{provider.company}</td>
                     <td>{provider.contact}</td>
+                    <td>
+                      {provider.locations && provider.locations.length > 0 ? (
+                        <div className="location-tags">
+                          {provider.locations.map((location, index) => (
+                            <span key={index} className="location-tag">
+                              {location}
+                              {index < provider.locations.length - 1
+                                ? ", "
+                                : ""}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        "No locations"
+                      )}
+                    </td>
                     <td>
                       <span
                         className={`status-badge ${
@@ -283,6 +339,22 @@ const ProviderManagement: React.FC = () => {
               style: { color: "white" },
             }}
           />
+          {/* <LocationInputField /> */}
+          <TextField
+            fullWidth
+            label="Locations (comma separated)*"
+            value={locations}
+            onChange={(e) => setLocations(e.target.value)}
+            margin="normal"
+            error={!!locationError}
+            helperText={locationError || "Enter locations separated by commas"}
+            InputLabelProps={{
+              style: { color: "#aaa" },
+            }}
+            InputProps={{
+              style: { color: "white" },
+            }}
+          />
           <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
             <Button
               onClick={() => setIsAddModalOpen(false)}
@@ -345,6 +417,21 @@ const ProviderManagement: React.FC = () => {
             onChange={(e) => setContact(e.target.value)}
             margin="normal"
             type="number"
+            InputLabelProps={{
+              style: { color: "#aaa" },
+            }}
+            InputProps={{
+              style: { color: "white" },
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Locations (comma separated)*"
+            value={locations}
+            onChange={(e) => setLocations(e.target.value)}
+            margin="normal"
+            error={!!locationError}
+            helperText={locationError || "Enter locations separated by commas"}
             InputLabelProps={{
               style: { color: "#aaa" },
             }}

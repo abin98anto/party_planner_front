@@ -1,45 +1,18 @@
 import React, { useState, useEffect } from "react";
-import {
-  Modal,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  SelectChangeEvent,
-} from "@mui/material";
+import { Box, Typography, Button, Modal } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import IProduct from "../../../entities/IProduct";
 import ICategory from "../../../entities/ICategory";
 import "./ProductManagement.scss";
 import { axiosInstance } from "../../../config/axiosConfig";
-import handleFileUpload, {
-  validateImageFile,
-} from "../../../shared/fileUpload";
 
 const ProductManagement: React.FC = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<IProduct[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
-  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [isListModalOpen, setIsListModalOpen] = useState<boolean>(false);
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
-  const [isUploading, setIsUploading] = useState<boolean>(false);
-  const [selectedDate, setSelectedDate] = useState<string>("");
-
-  // Product form state
-  const [productForm, setProductForm] = useState<IProduct>({
-    name: "",
-    description: "",
-    categoryId: "",
-    images: [],
-    price: 0,
-    datesAvailable: [],
-    isActive: true,
-  });
 
   useEffect(() => {
     fetchProducts();
@@ -63,139 +36,6 @@ const ProductManagement: React.FC = () => {
       setCategories(data.filter((category) => category.isActive));
     } catch (error) {
       console.error("Error fetching categories:", error);
-    }
-  };
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ): void => {
-    const { name, value } = e.target;
-    setProductForm({
-      ...productForm,
-      [name]: name === "price" ? parseFloat(value) : value,
-    });
-  };
-
-  const handleCategoryChange = (e: SelectChangeEvent): void => {
-    setProductForm({
-      ...productForm,
-      categoryId: e.target.value as string,
-    });
-  };
-
-  const handleImageUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ): Promise<void> => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    setIsUploading(true);
-
-    try {
-      const uploadPromises = Array.from(files).map((file) =>
-        handleFileUpload(file, {
-          validateFile: validateImageFile,
-        })
-      );
-
-      const results = await Promise.all(uploadPromises);
-
-      const uploadedUrls = results
-        .filter((result) => result.success && result.url)
-        .map((result) => result.url as string);
-
-      setProductForm({
-        ...productForm,
-        images: [...productForm.images, ...uploadedUrls],
-      });
-    } catch (error) {
-      console.error("Error uploading images:", error);
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleRemoveImage = (indexToRemove: number): void => {
-    setProductForm({
-      ...productForm,
-      images: productForm.images.filter((_, index) => index !== indexToRemove),
-    });
-  };
-
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    setSelectedDate(e.target.value);
-  };
-
-  const handleAddDate = (): void => {
-    if (selectedDate) {
-      const newDate = new Date(selectedDate);
-
-      // Check if date is already in the array
-      const dateExists = productForm.datesAvailable.some(
-        (date) => new Date(date).toDateString() === newDate.toDateString()
-      );
-
-      if (!dateExists) {
-        setProductForm({
-          ...productForm,
-          datesAvailable: [...productForm.datesAvailable, newDate],
-        });
-        setSelectedDate("");
-      }
-    }
-  };
-
-  const handleRemoveDate = (indexToRemove: number): void => {
-    setProductForm({
-      ...productForm,
-      datesAvailable: productForm.datesAvailable.filter(
-        (_, index) => index !== indexToRemove
-      ),
-    });
-  };
-
-  const resetForm = (): void => {
-    setProductForm({
-      name: "",
-      description: "",
-      categoryId: "",
-      images: [],
-      price: 0,
-      datesAvailable: [],
-      isActive: true,
-    });
-    setSelectedDate("");
-  };
-
-  const handleAddProduct = async (): Promise<void> => {
-    try {
-      const response = await axiosInstance.post("/product/add", productForm);
-      console.log("the add respnes", response);
-      if (response.status === 201) {
-        setIsAddModalOpen(false);
-        resetForm();
-        fetchProducts();
-      }
-    } catch (error) {
-      console.error("Error adding product:", error);
-    }
-  };
-
-  const handleEditProduct = async (): Promise<void> => {
-    try {
-      const response = await axiosInstance.put("/product/update", {
-        _id: selectedProduct?._id,
-        ...productForm,
-      });
-
-      if (response.status === 200) {
-        setIsEditModalOpen(false);
-        setSelectedProduct(null);
-        resetForm();
-        fetchProducts();
-      }
-    } catch (error) {
-      console.error("Error updating product:", error);
     }
   };
 
@@ -235,20 +75,7 @@ const ProductManagement: React.FC = () => {
   };
 
   const openEditModal = (product: IProduct): void => {
-    setSelectedProduct(product);
-
-    // Set form with current product data
-    setProductForm({
-      name: product.name,
-      description: product.description,
-      categoryId: product.categoryId,
-      images: product.images,
-      price: product.price,
-      datesAvailable: product.datesAvailable,
-      isActive: product.isActive,
-    });
-
-    setIsEditModalOpen(true);
+    navigate(`/add-product/${product._id}`);
   };
 
   const openDeleteModal = (product: IProduct): void => {
@@ -264,10 +91,6 @@ const ProductManagement: React.FC = () => {
   const getCategoryName = (categoryId: string): string => {
     const category = categories.find((cat) => cat._id === categoryId);
     return category ? category.name : "Unknown Category";
-  };
-
-  const formatDate = (date: Date): string => {
-    return new Date(date).toLocaleDateString();
   };
 
   const modalStyle = {
@@ -293,10 +116,7 @@ const ProductManagement: React.FC = () => {
           <Button
             variant="contained"
             className="add-button"
-            onClick={() => {
-              resetForm();
-              setIsAddModalOpen(true);
-            }}
+            onClick={() => navigate("/admin/add-product")}
           >
             Add Product
           </Button>
@@ -374,203 +194,6 @@ const ProductManagement: React.FC = () => {
           </div>
         )}
       </div>
-
-      {/* Add/Edit Product Modal Content */}
-      <Modal
-        open={isAddModalOpen || isEditModalOpen}
-        onClose={() => {
-          if (isAddModalOpen) {
-            setIsAddModalOpen(false);
-          } else {
-            setIsEditModalOpen(false);
-          }
-          resetForm();
-        }}
-        aria-labelledby="product-modal"
-      >
-        <Box sx={modalStyle}>
-          <Typography id="product-modal" variant="h6" component="h2" mb={2}>
-            {isAddModalOpen ? "Add New Product" : "Edit Product"}
-          </Typography>
-
-          <TextField
-            fullWidth
-            label="Product Name"
-            name="name"
-            value={productForm.name}
-            onChange={handleInputChange}
-            margin="normal"
-            InputLabelProps={{
-              style: { color: "#aaa" },
-            }}
-            InputProps={{
-              style: { color: "white" },
-            }}
-          />
-
-          <TextField
-            fullWidth
-            label="Description"
-            name="description"
-            multiline
-            rows={4}
-            value={productForm.description}
-            onChange={handleInputChange}
-            margin="normal"
-            InputLabelProps={{
-              style: { color: "#aaa" },
-            }}
-            InputProps={{
-              style: { color: "white" },
-            }}
-          />
-
-          <FormControl fullWidth margin="normal">
-            <InputLabel id="category-label" style={{ color: "#aaa" }}>
-              Category
-            </InputLabel>
-            <Select
-              labelId="category-label"
-              value={productForm.categoryId}
-              onChange={handleCategoryChange}
-              label="Category"
-              style={{ color: "white" }}
-            >
-              {categories.map((category) => (
-                <MenuItem key={category._id} value={category._id}>
-                  {category.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <TextField
-            fullWidth
-            label="Price"
-            name="price"
-            type="number"
-            value={productForm.price}
-            onChange={handleInputChange}
-            margin="normal"
-            InputLabelProps={{
-              style: { color: "#aaa" },
-            }}
-            InputProps={{
-              style: { color: "white" },
-            }}
-          />
-
-          {/* Image Upload Section */}
-          <Box sx={{ mt: 3, mb: 3 }}>
-            <Typography variant="subtitle1" mb={1}>
-              Images
-            </Typography>
-
-            <Button
-              variant="contained"
-              component="label"
-              disabled={isUploading}
-              sx={{ mb: 2 }}
-            >
-              {isUploading ? "Uploading..." : "Upload Images"}
-              <input
-                type="file"
-                multiple
-                hidden
-                onChange={handleImageUpload}
-                accept="image/jpeg,image/png,image/gif"
-              />
-            </Button>
-
-            {/* Image Preview */}
-            <div className="image-preview-container">
-              {productForm.images.map((image, index) => (
-                <div key={index} className="image-preview-item">
-                  <img
-                    src={image}
-                    alt={`Product ${index}`}
-                    className="image-preview"
-                  />
-                  <Button
-                    variant="contained"
-                    color="error"
-                    size="small"
-                    onClick={() => handleRemoveImage(index)}
-                    className="image-remove-btn"
-                  >
-                    X
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </Box>
-
-          {/* Date Availability Section */}
-          <Box sx={{ mt: 3, mb: 3 }}>
-            <Typography variant="subtitle1" mb={1}>
-              Dates Available
-            </Typography>
-
-            <div className="date-picker-container">
-              <TextField
-                type="date"
-                value={selectedDate}
-                onChange={handleDateChange}
-                InputProps={{
-                  style: { color: "white" },
-                }}
-                sx={{ mr: 2 }}
-              />
-              <Button
-                variant="contained"
-                onClick={handleAddDate}
-                disabled={!selectedDate}
-              >
-                Add Date
-              </Button>
-            </div>
-
-            {/* Selected Dates List */}
-            <div className="date-chips-container">
-              {productForm.datesAvailable.map((date, index) => (
-                <div key={index} className="date-chip">
-                  {formatDate(date)}
-                  <Button
-                    color="error"
-                    size="small"
-                    onClick={() => handleRemoveDate(index)}
-                    className="date-remove-btn"
-                  >
-                    X
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </Box>
-
-          <Box sx={{ mt: 3, display: "flex", justifyContent: "flex-end" }}>
-            <Button
-              onClick={() => {
-                if (isAddModalOpen) {
-                  setIsAddModalOpen(false);
-                } else {
-                  setIsEditModalOpen(false);
-                }
-                resetForm();
-              }}
-              sx={{ mr: 1, color: "white" }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              onClick={isAddModalOpen ? handleAddProduct : handleEditProduct}
-            >
-              {isAddModalOpen ? "Add" : "Update"}
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
 
       {/* Delete Confirmation Modal */}
       <Modal
