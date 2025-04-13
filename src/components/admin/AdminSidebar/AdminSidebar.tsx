@@ -14,6 +14,11 @@ const menuItems = [
     path: "/admin/category-management",
   },
   {
+    title: "Provider Management",
+    icon: SquareStack,
+    path: "/admin/provider-management",
+  },
+  {
     title: "Product Management",
     icon: BookOpen,
     path: "/admin/product-management",

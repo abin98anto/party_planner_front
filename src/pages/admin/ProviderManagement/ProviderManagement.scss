@@ -1,0 +1,150 @@
+.provider-management {
+    background-color: #2b2b2b;
+    min-height: 100vh;
+    padding: 2rem;
+    color: white;
+  
+    .provider-container {
+      max-width: 1200px;
+      margin: 0 auto;
+  
+      .header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 2rem;
+  
+        h1 {
+          margin-bottom: 1.5rem;
+          font-size: 2rem;
+        }
+  
+        .add-button {
+          background-color: #ff5722;
+          color: white;
+          border: none;
+          padding: 0.5rem 1rem;
+          border-radius: 4px;
+          font-size: 0.875rem;
+          cursor: pointer;
+          display: flex;
+          justify-content: center;
+          gap: 0.5rem;
+  
+          &:hover {
+            background-color: #f4511e;
+          }
+        }
+      }
+    }
+  
+    .table-container {
+      overflow-x: auto;
+  
+      .provider-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-bottom: 2rem;
+  
+        th,
+        td {
+          padding: 1rem;
+          text-align: left;
+        }
+  
+        th {
+          background-color: #1e1e1e;
+          font-weight: 600;
+          border-bottom: 2px solid #444;
+          position: sticky;
+          top: 0;
+        }
+  
+        tr {
+          transition: background-color 0.2s;
+  
+          &:hover {
+            background-color: #333;
+          }
+        }
+  
+        td {
+          border-bottom: 1px solid #444;
+        }
+      }
+    }
+  
+    .no-data-placeholder {
+      text-align: center;
+      padding: 3rem;
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      margin-top: 2rem;
+  
+      p {
+        color: #aaa;
+        font-size: 1rem;
+      }
+    }
+  
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      display: inline-block;
+  
+      &.active {
+        background-color: rgba(46, 204, 113, 0.2);
+        color: #2ecc71;
+      }
+  
+      &.inactive {
+        background-color: rgba(231, 76, 60, 0.2);
+        color: #e74c3c;
+      }
+    }
+  
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+  
+      .action-button {
+        background: none;
+        border: 1px solid;
+        padding: 0.25rem 0.75rem;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        transition: all 0.2s;
+  
+        &.edit {
+          border-color: #3498db;
+          color: #3498db;
+  
+          &:hover {
+            background-color: rgba(52, 152, 219, 0.2);
+          }
+        }
+  
+        &.delete {
+          border-color: #e74c3c;
+          color: #e74c3c;
+  
+          &:hover {
+            background-color: rgba(231, 76, 60, 0.2);
+          }
+        }
+  
+        &.list {
+          border-color: #2ecc71;
+          color: #2ecc71;
+  
+          &:hover {
+            background-color: rgba(46, 204, 113, 0.2);
+          }
+        }
+      }
+    }
+  }
