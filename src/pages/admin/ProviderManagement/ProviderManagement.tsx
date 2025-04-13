@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Modal,
-  Box,
-  Typography,
-  TextField,
-  Button,
-} from "@mui/material";
+import { Modal, Box, Typography, TextField, Button } from "@mui/material";
 import "./ProviderManagement.scss";
 import { axiosInstance } from "../../../config/axiosConfig";
 import IProvider from "../../../entities/IProvider";
@@ -155,6 +149,7 @@ const ProviderManagement: React.FC = () => {
     setName(provider.name);
     setCompany(provider.company);
     setContact(provider.contact);
+    setLocations(provider.locations.join(","));
     setIsEditModalOpen(true);
   };
 
@@ -167,7 +162,6 @@ const ProviderManagement: React.FC = () => {
     setSelectedProvider(provider);
     setIsListModalOpen(true);
   };
-
 
   const modalStyle = {
     position: "absolute",
@@ -427,7 +421,7 @@ const ProviderManagement: React.FC = () => {
           <TextField
             fullWidth
             label="Locations (comma separated)*"
-            value={locations}
+            value={locations.split(",")}
             onChange={(e) => setLocations(e.target.value)}
             margin="normal"
             error={!!locationError}
