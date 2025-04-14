@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
 import "./AllProducts.scss";
 import ICategory from "../../../entities/ICategory";
@@ -37,7 +36,9 @@ const AllProducts = () => {
   const [endDate, setEndDate] = useState("");
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
-  const [limit, setLimit] = useState(10);
+
+  // Fixed limit to 8 products per page
+  const limit = 8;
 
   const fetchProducts = async (page = 1) => {
     setLoading(true);
@@ -58,6 +59,7 @@ const AllProducts = () => {
         params,
       });
 
+      console.log("the response ", response);
       if (response.data.success) {
         setProducts(response.data.data);
         setPagination({
@@ -227,28 +229,6 @@ const AllProducts = () => {
         </form>
       </div>
 
-      {/* Results count and items per page */}
-      <div className="results-info">
-        <p>
-          Showing {products.length} of {pagination.totalCount} products
-        </p>
-        <div className="items-per-page">
-          <label>Items per page:</label>
-          <select
-            value={limit}
-            onChange={(e) => {
-              setLimit(Number(e.target.value));
-              fetchProducts(1);
-            }}
-          >
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={50}>50</option>
-          </select>
-        </div>
-      </div>
-
       {/* Loading and error states */}
       {loading && <div className="loading">Loading products...</div>}
       {error && <div className="error">{error}</div>}
@@ -278,10 +258,14 @@ const AllProducts = () => {
                   </p>
                   <p className="location">
                     <span className="location-icon">📍</span>
-                    {product.providerId
-                      ? product.providerId.locations.join(",")
+                    {product.providerId &&
+                    product.providerId.locations.length > 0
+                      ? product.providerId.locations
+                          .map((loc) => loc.name)
+                          .join(", ")
                       : "Unknown location"}
                   </p>
+
                   <p className="price">${product.price.toFixed(2)}</p>
                 </div>
               </div>
@@ -297,13 +281,6 @@ const AllProducts = () => {
       {/* Pagination */}
       {pagination.totalPages > 1 && (
         <div className="pagination">
-          <button
-            onClick={() => handlePageChange(1)}
-            disabled={pagination.currentPage === 1}
-            className="pagination-button"
-          >
-            &laquo;
-          </button>
           <button
             onClick={() => handlePageChange(pagination.currentPage - 1)}
             disabled={pagination.currentPage === 1}
@@ -330,13 +307,6 @@ const AllProducts = () => {
             className="pagination-button"
           >
             &rsaquo;
-          </button>
-          <button
-            onClick={() => handlePageChange(pagination.totalPages)}
-            disabled={pagination.currentPage === pagination.totalPages}
-            className="pagination-button"
-          >
-            &raquo;
           </button>
         </div>
       )}
