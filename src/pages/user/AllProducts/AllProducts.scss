@@ -77,10 +77,38 @@
       }
     }
 
-    &.price-filter,
-    &.date-filter {
+    &.price-filter {
       input {
         width: 100px;
+      }
+    }
+
+    &.date-filter {
+      position: relative;
+
+      .date-selector-button {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: white;
+        cursor: pointer;
+        min-width: 150px;
+        text-align: left;
+        position: relative;
+
+        &:hover {
+          border-color: #007bff;
+        }
+      }
+
+      .calendar-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        margin-top: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        border-radius: 8px;
       }
     }
   }

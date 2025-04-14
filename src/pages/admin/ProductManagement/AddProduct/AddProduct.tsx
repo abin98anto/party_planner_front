@@ -383,7 +383,7 @@ const AddProduct: React.FC = () => {
                 <button
                   type="button"
                   className="cancel-button"
-                  onClick={() => navigate("/product-management")}
+                  onClick={() => navigate("/admin/product-management")}
                 >
                   Cancel
                 </button>
