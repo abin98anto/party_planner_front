@@ -13,9 +13,7 @@ const CalendarNew: React.FC<CalendarProps> = ({
 }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  // Initialize with selected dates from props
   useEffect(() => {
-    // No need to update local state as we'll pass dates directly to parent
   }, [selectedDates]);
 
   const getMonthData = (date: Date) => {
@@ -30,12 +28,10 @@ const CalendarNew: React.FC<CalendarProps> = ({
 
     const days = [];
 
-    // Add empty cells for days before the first day of the month
     for (let i = 0; i < startDayOfWeek; i++) {
       days.push(null);
     }
 
-    // Add days of the month
     for (let i = 1; i <= daysInMonth; i++) {
       days.push(new Date(year, month, i));
     }
@@ -60,9 +56,6 @@ const CalendarNew: React.FC<CalendarProps> = ({
 
   const handleDateClick = (date: Date) => {
     if (isDateDisabled(date)) return;
-
-    // Immediately call onSelectDates with the selected date
-    // This will close the calendar and update the filters
     onSelectDates([date]);
   };
 
@@ -128,8 +121,6 @@ const CalendarNew: React.FC<CalendarProps> = ({
           </div>
         ))}
       </div>
-
-      {/* Apply button removed since it's no longer needed */}
     </div>
   );
 };

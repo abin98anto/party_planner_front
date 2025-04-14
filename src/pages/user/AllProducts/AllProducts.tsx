@@ -20,17 +20,6 @@ interface IProductNew {
   isActive: boolean;
 }
 
-// interface ProductQueryParams {
-//   page: number;
-//   limit: number;
-//   search?: string;
-//   minPrice?: string;
-//   maxPrice?: string;
-//   category?: string;
-//   location?: string;
-//   date?: string; // Changed to single date parameter
-// }
-
 const AllProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,7 +30,6 @@ const AllProducts = () => {
     totalCount: 0,
   });
 
-  // Filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
@@ -49,15 +37,10 @@ const AllProducts = () => {
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null); // Changed to single date
   const [showCalendar, setShowCalendar] = useState(false);
-
-  // Options for filters
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
-
-  // Fixed limit to 8 products per page
   const limit = 8;
 
-  // Debug function to log current filters
   const logCurrentFilters = () => {
     console.log("Current Filters:", {
       searchTerm,
@@ -73,41 +56,30 @@ const AllProducts = () => {
     setLoading(true);
 
     try {
-      // Build query parameters
       const params: Record<string, any> = {
         page,
         limit,
       };
 
-      // Only add parameters that have values
       if (searchTerm.trim()) params.search = searchTerm.trim();
       if (minPrice) params.minPrice = minPrice;
       if (maxPrice) params.maxPrice = maxPrice;
 
-      // Handle categoryId
       if (selectedCategory) {
         params.category = selectedCategory;
       }
 
-      // Handle location correctly
       if (selectedLocation) {
         params.location = selectedLocation;
       }
 
-      // Handle single date selection
       if (selectedDate) {
-        // Format date as YYYY-MM-DD
         params.date = selectedDate.toISOString().split("T")[0];
       }
-
-      // Log the params for debugging
-      console.log("Sending params to backend:", params);
 
       const response = await axiosInstance.get("/product/all-products", {
         params,
       });
-
-      console.log("Backend response:", response.data);
 
       if (response.data.success) {
         setProducts(response.data.data);
@@ -129,13 +101,11 @@ const AllProducts = () => {
 
   const fetchFilterOptions = async () => {
     try {
-      // Fetch categories
       const categoriesResponse = await axiosInstance.get("/category");
       if (categoriesResponse.data.success) {
         setCategories(categoriesResponse.data.data || []);
       }
 
-      // Fetch locations
       const locationsResponse = await axiosInstance.get("/location");
       if (locationsResponse.data.success) {
         setLocations(locationsResponse.data.data || []);
@@ -145,56 +115,46 @@ const AllProducts = () => {
     }
   };
 
-  // Initial data fetch
   useEffect(() => {
     fetchProducts();
     fetchFilterOptions();
   }, []);
 
-  // Form submission for search
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchProducts(1); // Reset to first page when searching
+    fetchProducts(1);
   };
 
-  // Handle category selection
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const categoryId = e.target.value;
     setSelectedCategory(categoryId);
-    // Don't fetch here - will be handled by the effect
   };
 
   // Handle location selection
   const handleLocationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const locationId = e.target.value;
     setSelectedLocation(locationId);
-    // Don't fetch here - will be handled by the effect
   };
 
-  // Fetch products when filters change
   useEffect(() => {
     logCurrentFilters();
     fetchProducts(1);
   }, [selectedCategory, selectedLocation]);
 
-  // Handle price filter changes
   const handlePriceChange = () => {
-    fetchProducts(1); // Reset to first page when filtering by price
+    fetchProducts(1);
   };
 
-  // Handle date selection - modified for single date
-  // Handle date selection - modified for single date
   const handleDateSelection = (dates: Date[]) => {
     if (dates.length > 0) {
-      setSelectedDate(dates[0]); // Only take the first date
+      setSelectedDate(dates[0]);
     } else {
       setSelectedDate(null);
     }
-    setShowCalendar(false); // Close the calendar
-    fetchProducts(1); // Reset to first page when date selection changes
+    setShowCalendar(false);
+    fetchProducts(1);
   };
 
-  // Reset all filters
   const resetFilters = () => {
     setSearchTerm("");
     setMinPrice("");
@@ -202,17 +162,15 @@ const AllProducts = () => {
     setSelectedCategory("");
     setSelectedLocation("");
     setSelectedDate(null);
-    fetchProducts(1); // Reset to first page when clearing filters
+    fetchProducts(1);
   };
 
-  // Handle pagination
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= pagination.totalPages) {
       fetchProducts(newPage);
     }
   };
 
-  // Helper to generate page numbers for pagination
   const getPageNumbers = () => {
     const pageNumbers = [];
     const { currentPage, totalPages } = pagination;
@@ -227,13 +185,11 @@ const AllProducts = () => {
     return pageNumbers;
   };
 
-  // Format selected date for display
   const formatSelectedDate = () => {
     if (!selectedDate) return "Select date";
     return selectedDate.toLocaleDateString();
   };
 
-  // Check if pagination should be shown (more than 8 products)
   const shouldShowPagination = pagination.totalCount > limit;
 
   return (
@@ -307,7 +263,6 @@ const AllProducts = () => {
                 <CalendarNew
                   selectedDates={selectedDate ? [selectedDate] : []}
                   onSelectDates={handleDateSelection}
-                  // singleDateMode={true} // Add this prop to your Calendar component
                 />
               </div>
             )}
