@@ -7,6 +7,7 @@ import IProvider from "../../../entities/IProvider";
 import { axiosInstance } from "../../../config/axiosConfig";
 import ILocation from "../../../entities/ILocation";
 import CalendarNew from "./calendar-new";
+import { useNavigate } from "react-router-dom";
 
 interface IProductNew {
   _id?: string;
@@ -192,6 +193,11 @@ const AllProducts = () => {
 
   const shouldShowPagination = pagination.totalCount > limit;
 
+  const navigate = useNavigate();
+  const goToProductPage = (productId: string) => {
+    navigate(`/product/${productId}`);
+  };
+
   return (
     <div className="all-products-container">
       <h1>All Products</h1>
@@ -285,7 +291,10 @@ const AllProducts = () => {
             {products.length > 0 ? (
               products.map((product: IProductNew) => (
                 <div key={product._id} className="product-card">
-                  <div className="product-image">
+                  <div
+                    className="product-image"
+                    onClick={() => goToProductPage(product._id as string)}
+                  >
                     <img
                       src={
                         product.images && product.images.length > 0

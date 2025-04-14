@@ -5,6 +5,7 @@ import NotFound from "../components/common/NotFound/NotFound";
 import UserLogin from "../pages/user/UserLogin/UserLogin";
 import UserSignup from "../pages/user/UserSignup/UserSignup";
 import AllProducts from "../pages/user/AllProducts/AllProducts";
+import ProductDetails from "../pages/user/ProductDetails/ProductDetails";
 
 const UserRoutes = () => {
   return (
@@ -15,6 +16,7 @@ const UserRoutes = () => {
           <Route path="/login" element={<UserLogin />} />
           <Route path="/signup" element={<UserSignup />} />
           <Route path="/products" element={<AllProducts />} />
+          <Route path="/product/:productId" element={<ProductDetails />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
