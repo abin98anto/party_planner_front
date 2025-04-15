@@ -1,0 +1,141 @@
+.user-orders {
+  display: flex;
+  height: 100%;
+  min-height: 500px;
+
+  .sidebar {
+    width: 250px;
+    background-color: #f5f5f5;
+    border-right: 1px solid #e0e0e0;
+    padding: 20px 0;
+
+    .sidebar-item {
+      padding: 15px 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+
+      &:hover {
+        background-color: #eeeeee;
+      }
+
+      &.active {
+        background-color: #e0e0e0;
+        border-left: 4px solid #2c3e50;
+      }
+    }
+  }
+
+  .content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      color: #2c3e50;
+    }
+
+    .loading,
+    .error,
+    .no-orders {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+      font-size: 1rem;
+      color: #555;
+    }
+
+    .error {
+      color: #d9534f;
+    }
+
+    .orders-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+
+      .order-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        background-color: #fff;
+
+        .order-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 15px;
+
+          h3 {
+            margin: 0;
+            font-size: 1.1rem;
+          }
+
+          .status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: lowercase;
+
+            &.pending {
+              background-color: #f0ad4e;
+              color: #fff;
+            }
+
+            &.completed {
+              background-color: #5cb85c;
+              color: #fff;
+            }
+
+            &.cancelled {
+              background-color: #d9534f;
+              color: #fff;
+            }
+          }
+        }
+
+        .order-details {
+          .detail-item {
+            display: flex;
+            margin-bottom: 8px;
+
+            .label {
+              font-weight: 500;
+              width: 80px;
+              color: #666;
+            }
+
+            .value {
+              flex: 1;
+            }
+          }
+        }
+
+        .order-actions {
+          margin-top: 15px;
+          text-align: right;
+
+          .cancel-btn {
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+
+            &:hover {
+              background-color: #c9302c;
+            }
+          }
+        }
+      }
+    }
+  }
+}
