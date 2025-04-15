@@ -1,5 +1,6 @@
 .user-header {
-  background-color: #ffffff;
+  // background-color: rgba(0, 0, 0, 0.6);
+  background-color: black;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 1rem 2rem;
   .user-container {
@@ -13,7 +14,7 @@
     font-family: "Kalam", cursive;
     font-size: 1.5rem;
     font-weight: 700;
-    color: black;
+    color: #ffffff;
     text-decoration: none;
     &:hover {
       color: #ff6a3d;

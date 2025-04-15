@@ -131,7 +131,6 @@ const AllProducts = () => {
     setSelectedCategory(categoryId);
   };
 
-  // Handle location selection
   const handleLocationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const locationId = e.target.value;
     setSelectedLocation(locationId);
@@ -281,7 +280,21 @@ const AllProducts = () => {
       </div>
 
       {/* Loading and error states */}
-      {loading && <div className="loading">Loading products...</div>}
+      {loading && (
+        <div className="products-grid">
+          {[...Array(8)].map((_, index) => (
+            <div key={index} className="product-skeleton-card">
+              <div className="product-skeleton-image shimmer-effect"></div>
+              <div className="product-skeleton-info">
+                <div className="skeleton-title shimmer-effect"></div>
+                <div className="skeleton-category shimmer-effect"></div>
+                <div className="skeleton-location shimmer-effect"></div>
+                <div className="skeleton-price shimmer-effect"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
       {error && <div className="error">{error}</div>}
 
       {/* Products grid */}

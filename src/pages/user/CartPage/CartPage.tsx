@@ -6,9 +6,9 @@ import "./CartPage.scss";
 import { axiosInstance } from "../../../config/axiosConfig";
 import { useAppSelector } from "../../../hooks/reduxHooks";
 import IAddress from "../../../entities/IAddress";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import AddressModal from "./AddressModal";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 interface Location {
   _id: string;
@@ -325,10 +325,27 @@ const CartPage: React.FC = () => {
     }
   };
 
+  const EmptyCart = () => {
+    return (
+      <div className="empty-cart-container">
+        <div className="empty-cart-icon">
+          <ShoppingCart size={64} />
+        </div>
+        <h2 className="empty-cart-title">Your Cart is Empty</h2>
+        <p className="empty-cart-message">
+          Looks like you haven't added any services to your cart yet.
+        </p>
+        <Link to="/products" className="browse-services-btn">
+          Browse Services
+        </Link>
+      </div>
+    );
+  };
+
   if (loading) return <div className="cart-loading">Loading cart...</div>;
   if (error) return <div className="cart-error">{error}</div>;
   if (!cart || !cart.products || cart.products.length === 0) {
-    return <div className="cart-empty">Your cart is empty</div>;
+    return <EmptyCart />;
   }
 
   return (
