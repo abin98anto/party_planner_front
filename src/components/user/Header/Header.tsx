@@ -45,6 +45,10 @@ const Header: React.FC = () => {
     handleMenuClose();
   };
 
+  const goHome = () => {
+    navigate("/");
+  };
+
   const handleLogout = async () => {
     await dispatch(logout()).unwrap();
     handleMenuClose();
@@ -59,7 +63,9 @@ const Header: React.FC = () => {
         <div className="user-header-links">
           <div>
             <Stack spacing={2} direction="row" alignItems="center">
-              <Button variant="text">Home</Button>
+              <Button variant="text" onClick={goHome}>
+                Home
+              </Button>
               <Button variant="text" onClick={goToProducts}>
                 Products
               </Button>

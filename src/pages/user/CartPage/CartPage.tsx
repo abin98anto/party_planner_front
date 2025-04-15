@@ -93,7 +93,7 @@ const CartPage: React.FC = () => {
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
     null
   );
-
+  const [orderSuccess, setOrderSuccess] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -308,12 +308,14 @@ const CartPage: React.FC = () => {
         address,
       };
 
-      console.log("Sending order data:", orderData);
       const response = await axiosInstance.post("/order/add", orderData);
 
       if (response.data.success) {
-        alert("Order placed successfully!");
-        // You can redirect or perform additional actions here
+        setOrderSuccess(true);
+        setTimeout(async () => {
+          await axiosInstance.delete(`/cart/${cart?._id}`);
+          navigate("/profile");
+        }, 3000);
       }
     } catch (err) {
       console.error("Error placing order:", err);
@@ -480,6 +482,14 @@ const CartPage: React.FC = () => {
           onSave={handleSaveAddress}
           address={selectedAddress}
         />
+      )}
+
+      {orderSuccess && (
+        <div className="order-success-overlay">
+          <div className="order-success-message">
+            <h2>Order Placed Successfully!</h2>
+          </div>
+        </div>
       )}
     </div>
   );
