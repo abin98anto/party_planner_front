@@ -1,3 +1,5 @@
+import IProvider from "./IProvider";
+
 export default interface IProduct {
   _id?: string;
   name: string;
@@ -6,6 +8,6 @@ export default interface IProduct {
   images: string[];
   price: number;
   datesAvailable: Date[];
-  providerId: string;
+  providerId: IProvider | string;
   isActive: boolean;
 }
