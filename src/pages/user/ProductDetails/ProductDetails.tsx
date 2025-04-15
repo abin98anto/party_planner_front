@@ -1,46 +1,18 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import "./ProductDetails.scss";
 import { axiosInstance } from "../../../config/axiosConfig";
 import { useParams } from "react-router-dom";
+import ILocation from "../../../entities/ILocation";
+import ICategory from "../../../entities/ICategory";
+import IProvider from "../../../entities/IProvider";
 
-// Updated type definitions to match actual API response
-interface Category {
-  _id: string;
-  name: string;
-  isActive: boolean;
-  isDeleted: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface LocationData {
-  _id: string;
-  name: string;
-  isActive: boolean;
-  isDeleted: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface ProviderData {
-  _id: string;
-  name: string;
-  company: string;
-  contact: number;
-  locations: LocationData[];
-  isActive: boolean;
-  isDeleted: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-// Updated Product interface to match the nested structure
 interface Product {
   _id: string;
   name: string;
   description: string;
-  categoryId: Category;
-  providerId: ProviderData;
+  categoryId: ICategory;
+  providerId: IProvider;
   images: string[];
   price: number;
   datesAvailable: string[];
@@ -49,17 +21,11 @@ interface Product {
   updatedAt: string;
 }
 
-// interface Location {
-//   id: string;
-//   name: string;
-//   address?: string;
-// }
-
 const ProductDetails: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>("");
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(
+  const [selectedDates, setSelectedDates] = useState<Date[]>([]);
+  const [selectedLocation, setSelectedLocation] = useState<ILocation | null>(
     null
   );
   const [error, setError] = useState<string>("");
@@ -67,34 +33,11 @@ const ProductDetails: React.FC = () => {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const { productId } = useParams<{ productId: string }>();
 
-  // Fetch product data when component mounts or productId changes
   useEffect(() => {
-    const fetchProductData = async () => {
-      setLoading(true);
-      setFetchError(null);
-
-      try {
-        // Fetch product data using axios
-        const productResponse = await axiosInstance.get(
-          `/product/${productId}`
-        );
-        console.log("the prod res", productResponse.data.data);
-
-        // Use the data property from the response
-        const productData = productResponse.data.data;
-        setProduct(productData);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        setFetchError("An error occurred while fetching product data");
-        setLoading(false);
-      }
-    };
-
     if (productId) {
       fetchProductData();
     }
-  }, [productId]);
+  }, []);
 
   useEffect(() => {
     if (product?.images && product.images.length > 0) {
@@ -102,12 +45,26 @@ const ProductDetails: React.FC = () => {
     }
   }, [product]);
 
-  // Format the price with currency symbol
+  const fetchProductData = async () => {
+    setLoading(true);
+    setFetchError(null);
+
+    try {
+      const productResponse = await axiosInstance.get(`/product/${productId}`);
+      const productData = productResponse.data.data;
+      setProduct(productData);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setFetchError("An error occurred while fetching product data");
+      setLoading(false);
+    }
+  };
+
   const formatPrice = (price: number): string => {
     return `$${price}`;
   };
 
-  // Format the date for display
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -117,11 +74,38 @@ const ProductDetails: React.FC = () => {
     });
   };
 
-  // Handle the checkout process
+  const datesClassName = (dateString: string) => {
+    return `date-option ${
+      selectedDates.some((d) => d.getTime() === new Date(dateString).getTime())
+        ? "active"
+        : ""
+    }`;
+  };
+
+  const locationClassName = (location: ILocation) => {
+    return `location-option ${
+      selectedLocation && selectedLocation._id === location._id ? "active" : ""
+    }`;
+  };
+
+  const selectDates = (dateString: string) => {
+    try {
+      const dateObj = new Date(dateString);
+      setSelectedDates((prevDates) => {
+        const exists = prevDates.some((d) => d.getTime() === dateObj.getTime());
+        return exists
+          ? prevDates.filter((d) => d.getTime() !== dateObj.getTime())
+          : [...prevDates, dateObj];
+      });
+    } catch (error) {
+      console.log("error selecting dates", error);
+    }
+  };
+
   const handleCheckout = (): void => {
     if (!product) return;
 
-    if (!selectedDate) {
+    if (!selectedDates) {
       setError("Please select a date");
       return;
     }
@@ -135,7 +119,6 @@ const ProductDetails: React.FC = () => {
     console.log("go to checkout page");
   };
 
-  // Loading state
   if (loading) {
     return (
       <div className="product-details__loading">
@@ -145,7 +128,6 @@ const ProductDetails: React.FC = () => {
     );
   }
 
-  // Error state
   if (fetchError || !product) {
     return (
       <div className="product-details__error-container">
@@ -222,13 +204,8 @@ const ProductDetails: React.FC = () => {
               product.datesAvailable.map((date, index) => (
                 <div
                   key={index}
-                  className={`date-option ${
-                    selectedDate &&
-                    selectedDate.getTime() === new Date(date).getTime()
-                      ? "active"
-                      : ""
-                  }`}
-                  onClick={() => setSelectedDate(new Date(date))}
+                  className={datesClassName(date)}
+                  onClick={() => selectDates(date)}
                 >
                   {formatDate(date)}
                 </div>
@@ -247,11 +224,7 @@ const ProductDetails: React.FC = () => {
                 product.providerId.locations.map((location) => (
                   <div
                     key={location._id}
-                    className={`location-option ${
-                      selectedLocation && selectedLocation._id === location._id
-                        ? "active"
-                        : ""
-                    }`}
+                    className={locationClassName(location)}
                     onClick={() => setSelectedLocation(location)}
                   >
                     <h4>{location.name}</h4>

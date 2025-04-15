@@ -6,5 +6,6 @@ export default interface IProduct {
   images: string[];
   price: number;
   datesAvailable: Date[];
+  providerId: string;
   isActive: boolean;
 }
