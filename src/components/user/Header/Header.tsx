@@ -12,6 +12,9 @@ const Header: React.FC = () => {
   const goToProducts = () => {
     navigate("/products");
   };
+  const goToCart = () => {
+    navigate("/cart");
+  };
 
   return (
     <header className="user-header">
@@ -26,6 +29,9 @@ const Header: React.FC = () => {
               <Button variant="text">Home</Button>
               <Button variant="text" onClick={goToProducts}>
                 Products
+              </Button>
+              <Button variant="text" onClick={goToCart}>
+                Cart
               </Button>
               <Button variant="outlined" onClick={goToLogin}>
                 Login
