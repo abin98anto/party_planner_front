@@ -80,11 +80,6 @@ const ProductDetails: React.FC = () => {
             (loc: ILocation) =>
               String(loc._id) === String(cartProduct.locationId._id)
           );
-
-          console.log("Location IDs comparison:", {
-            locationIdFromCart: cartProduct.locationId._id,
-            providerLocations: provider.locations.map((loc) => loc._id),
-          });
           setSelectedLocation(cartLocation || provider.locations[0]);
         }
       }
