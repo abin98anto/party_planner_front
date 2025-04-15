@@ -8,6 +8,7 @@ import { useAppSelector } from "../../../hooks/reduxHooks";
 import IAddress from "../../../entities/IAddress";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import AddressModal from "./AddressModal";
+import { useNavigate } from "react-router-dom";
 
 interface Location {
   _id: string;
@@ -93,6 +94,8 @@ const CartPage: React.FC = () => {
     null
   );
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (userId) {
       fetchAddresses();
@@ -107,11 +110,9 @@ const CartPage: React.FC = () => {
       if (response.data.success) {
         setAddresses(response.data.data);
 
-        // If there's at least one address, select the first one by default
         if (response.data.data.length > 0) {
           setSelectedAddressId(response.data.data[0]._id);
 
-          // Format the address for order submission
           const addr = response.data.data[0];
           const formattedAddress = `${addr.venue}, ${addr.place}${
             addr.landmark ? `, ${addr.landmark}` : ""
@@ -150,7 +151,6 @@ const CartPage: React.FC = () => {
         alert("Address deleted successfully");
         setAddresses(addresses.filter((addr) => addr._id !== addressId));
 
-        // If the deleted address was the selected one, clear selection
         if (selectedAddressId === addressId) {
           setSelectedAddressId(null);
           setAddress("");
@@ -168,7 +168,6 @@ const CartPage: React.FC = () => {
     try {
       setIsLoading(true);
       if (selectedAddress && selectedAddress._id) {
-        // Update existing address
         const response = await axiosInstance.put("/address/update", {
           ...addressData,
           _id: selectedAddress._id,
@@ -183,7 +182,6 @@ const CartPage: React.FC = () => {
           );
           setAddresses(updatedAddresses);
 
-          // If this was the selected address, update the formatted address
           if (selectedAddressId === selectedAddress._id) {
             const formattedAddress = `${addressData.venue}, ${
               addressData.place
@@ -196,7 +194,6 @@ const CartPage: React.FC = () => {
           }
         }
       } else {
-        // Add new address
         const response = await axiosInstance.post("/address/add", {
           ...addressData,
           userId,
@@ -208,7 +205,6 @@ const CartPage: React.FC = () => {
           const newAddress = response.data.data;
           setAddresses([...addresses, newAddress]);
 
-          // If this is the first address, select it automatically
           if (addresses.length === 0) {
             setSelectedAddressId(newAddress._id);
             const formattedAddress = `${newAddress.venue}, ${newAddress.place}${
@@ -356,7 +352,11 @@ const CartPage: React.FC = () => {
               const itemTotal = calculateItemTotal(product);
 
               return (
-                <tr key={product._id || index}>
+                <tr
+                  key={product._id || index}
+                  onClick={() => navigate(`/product/${product.productId?._id}`)}
+                  style={{ cursor: "pointer" }}
+                >
                   <td>{index + 1}</td>
                   <td>{product.productId?.name || "Unknown Product"}</td>
                   <td>
@@ -469,7 +469,7 @@ const CartPage: React.FC = () => {
           onClick={handlePlaceOrder}
           disabled={isSubmitting || addresses.length === 0}
         >
-          {isSubmitting ? "Processing..." : "Place Order"}
+          {isSubmitting ? "Processing..." : "Book Service"}
         </button>
       </div>
 
