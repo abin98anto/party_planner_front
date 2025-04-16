@@ -50,7 +50,6 @@ interface IProductNew {
   isActive: boolean;
 }
 
-// Service item type
 interface ServiceItem {
   icon: React.ReactNode;
   title: string;
@@ -76,7 +75,7 @@ const HomePage: React.FC = () => {
               new Date(a.datesAvailable[0]).getTime()
             );
           })
-          .slice(0, 4);
+          .slice(0, 5);
 
         setLatestProducts(sortedProducts);
         setLoading(false);
@@ -90,7 +89,6 @@ const HomePage: React.FC = () => {
     fetchLatestProducts();
   }, []);
 
-  // Services data
   const services: ServiceItem[] = [
     {
       icon: <PartyPopper size={48} />,
@@ -151,7 +149,7 @@ const HomePage: React.FC = () => {
 
         {loading ? (
           <div className="products-grid">
-            {[...Array(4)].map((_, index) => (
+            {[...Array(5)].map((_, index) => (
               <div key={index} className="product-skeleton-card">
                 <div className="product-skeleton-image shimmer-effect"></div>
                 <div className="product-skeleton-info">

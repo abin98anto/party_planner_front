@@ -1,0 +1,220 @@
+.order-management {
+  background-color: #2b2b2b;
+  min-height: 100vh;
+  padding: 2rem;
+  color: white;
+
+  .order-container {
+    max-width: 1200px;
+    margin: 0 auto;
+
+    .header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 2rem;
+
+      h1 {
+        margin-bottom: 1.5rem;
+        font-size: 2rem;
+      }
+
+      .filter-buttons {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: center;
+
+        .filter-button {
+          background-color: #1e1e1e;
+          color: #aaa;
+          border: 1px solid #444;
+          padding: 0.5rem 1rem;
+          border-radius: 4px;
+          font-size: 0.875rem;
+          cursor: pointer;
+          transition: all 0.2s;
+
+          &:hover {
+            background-color: #333;
+            color: white;
+          }
+
+          &.active {
+            background-color: #ff5722;
+            color: white;
+            border-color: #ff5722;
+          }
+        }
+      }
+    }
+  }
+
+  .table-container {
+    overflow-x: auto;
+
+    .order-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-bottom: 2rem;
+
+      th,
+      td {
+        padding: 1rem;
+        text-align: left;
+      }
+
+      th {
+        background-color: #1e1e1e;
+        font-weight: 600;
+        border-bottom: 2px solid #444;
+        position: sticky;
+        top: 0;
+      }
+
+      tr {
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: #333;
+        }
+      }
+
+      td {
+        border-bottom: 1px solid #444;
+      }
+
+      .address-cell {
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  .no-data-placeholder {
+    text-align: center;
+    padding: 3rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-top: 2rem;
+
+    p {
+      color: #aaa;
+      font-size: 1rem;
+    }
+  }
+
+  .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    display: inline-block;
+
+    &.pending {
+      background-color: rgba(255, 193, 7, 0.2);
+      color: #ffc107;
+    }
+
+    &.completed {
+      background-color: rgba(46, 204, 113, 0.2);
+      color: #2ecc71;
+    }
+
+    &.cancelled {
+      background-color: rgba(231, 76, 60, 0.2);
+      color: #e74c3c;
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+
+    .action-button {
+      background: none;
+      border: 1px solid;
+      padding: 0.25rem 0.75rem;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      transition: all 0.2s;
+
+      &.edit {
+        border-color: #3498db;
+        color: #3498db;
+
+        &:hover {
+          background-color: rgba(52, 152, 219, 0.2);
+        }
+      }
+
+      &.delete {
+        border-color: #e74c3c;
+        color: #e74c3c;
+
+        &:hover {
+          background-color: rgba(231, 76, 60, 0.2);
+        }
+      }
+
+      &.list {
+        border-color: #2ecc71;
+        color: #2ecc71;
+
+        &:hover {
+          background-color: rgba(46, 204, 113, 0.2);
+        }
+      }
+    }
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 2rem 0;
+
+    .pagination-btn {
+      background-color: #1e1e1e;
+      color: #aaa;
+      border: 1px solid #444;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover:not(:disabled) {
+        background-color: #333;
+        color: white;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &.active {
+        background-color: #ff5722;
+        color: white;
+        border-color: #ff5722;
+      }
+    }
+
+    .ellipsis {
+      color: #aaa;
+      padding: 0 0.5rem;
+    }
+  }
+
+  .order-count {
+    text-align: center;
+    color: #aaa;
+    font-size: 0.875rem;
+    margin-bottom: 2rem;
+  }
+}
