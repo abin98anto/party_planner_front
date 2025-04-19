@@ -8,6 +8,7 @@ import AllProducts from "../pages/user/AllProducts/AllProducts";
 import ProductDetails from "../pages/user/ProductDetails/ProductDetails";
 import CartPage from "../pages/user/CartPage/CartPage";
 import UserProfile from "../pages/user/UserProfile/UserProfile";
+import ProtectedRoute from "../components/common/ProtectedRoutes/ProtectedRoutes";
 
 const UserRoutes = () => {
   return (
@@ -15,13 +16,19 @@ const UserRoutes = () => {
       <Routes>
         <Route element={<UserLayout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<UserLogin />} />
-          <Route path="/signup" element={<UserSignup />} />
           <Route path="/products" element={<AllProducts />} />
           <Route path="/product/:productId" element={<ProductDetails />} />
           <Route path="/cart" element={<CartPage />} />
-          <Route path="/profile" element={<UserProfile />} />
           <Route path="*" element={<NotFound />} />
+
+          {/* Don't let user of if there is userInfo */}
+          <Route path="/login" element={<UserLogin />} />
+          <Route path="/signup" element={<UserSignup />} />
+
+          {/* Don't let user go if there is nothing in the userInfo */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/profile" element={<UserProfile />} />
+          </Route>
         </Route>
       </Routes>
     </>
