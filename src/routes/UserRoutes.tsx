@@ -22,12 +22,11 @@ const UserRoutes = () => {
           <Route path="/cart" element={<CartPage />} />
           <Route path="*" element={<NotFound />} />
 
-          {/* Don't let user of if there is userInfo */}
           <Route element={<UnProtectedRoute />}>
             <Route path="/login" element={<UserLogin />} />
             <Route path="/signup" element={<UserSignup />} />
           </Route>
-          {/* Don't let user go if there is nothing in the userInfo */}
+          
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<UserProfile />} />
           </Route>
