@@ -9,6 +9,7 @@ import ProductDetails from "../pages/user/ProductDetails/ProductDetails";
 import CartPage from "../pages/user/CartPage/CartPage";
 import UserProfile from "../pages/user/UserProfile/UserProfile";
 import ProtectedRoute from "../components/common/ProtectedRoutes/ProtectedRoutes";
+import UnProtectedRoute from "../components/common/ProtectedRoutes/UnProtectedRoute";
 
 const UserRoutes = () => {
   return (
@@ -22,9 +23,10 @@ const UserRoutes = () => {
           <Route path="*" element={<NotFound />} />
 
           {/* Don't let user of if there is userInfo */}
-          <Route path="/login" element={<UserLogin />} />
-          <Route path="/signup" element={<UserSignup />} />
-
+          <Route element={<UnProtectedRoute />}>
+            <Route path="/login" element={<UserLogin />} />
+            <Route path="/signup" element={<UserSignup />} />
+          </Route>
           {/* Don't let user go if there is nothing in the userInfo */}
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<UserProfile />} />
