@@ -42,17 +42,6 @@ const AllProducts = () => {
   const [locations, setLocations] = useState([]);
   const limit = 8;
 
-  const logCurrentFilters = () => {
-    console.log("Current Filters:", {
-      searchTerm,
-      minPrice,
-      maxPrice,
-      selectedCategory,
-      selectedLocation,
-      selectedDate,
-    });
-  };
-
   const fetchProducts = async (page = 1) => {
     setLoading(true);
 
@@ -139,7 +128,6 @@ const AllProducts = () => {
   };
 
   useEffect(() => {
-    logCurrentFilters();
     fetchProducts(1);
   }, [selectedCategory, selectedLocation]);
 
