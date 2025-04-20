@@ -71,8 +71,6 @@ const AllProducts = () => {
         params,
       });
 
-      console.log("produts fetched,", response.data);
-
       if (response.data.success) {
         setProducts(response.data.data);
         setPagination({
