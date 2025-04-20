@@ -36,7 +36,7 @@ const AllProducts = () => {
   const [maxPrice, setMaxPrice] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null); // Changed to single date
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
@@ -81,6 +81,8 @@ const AllProducts = () => {
       const response = await axiosInstance.get("/product/all-products", {
         params,
       });
+
+      console.log("produts fetched,", response.data);
 
       if (response.data.success) {
         setProducts(response.data.data);
