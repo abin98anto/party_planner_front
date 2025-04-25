@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import AdminLogin from "../pages/admin/AdminLogin/AdminLogin";
 import NotFound from "../components/common/NotFound/NotFound";
-import AdminDashboard from "../pages/admin/AdminDashboard/AdminDashboard";
 import AdminLayout from "../components/admin/AdminLayout/AdminLayout";
 import CategoryManagement from "../pages/admin/CategoryManagement/CategoryManagement";
 import ProductManagement from "../pages/admin/ProductManagement/ProductManagement";
@@ -21,7 +20,6 @@ const AdminRoutes = () => {
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AdminLayout />}>
-          <Route path="/dashboard" element={<AdminDashboard />} />
           <Route path="/category-management" element={<CategoryManagement />} />
           <Route path="/location-management" element={<LocationManagement />} />
           <Route path="/product-management" element={<ProductManagement />} />

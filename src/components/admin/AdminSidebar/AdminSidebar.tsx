@@ -1,20 +1,12 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  BarChart2,
-  BookOpen,
-  Layers,
-  Map,
-  SquareStack,
-  Users,
-} from "lucide-react";
+import { BookOpen, Layers, Map, SquareStack, Users } from "lucide-react";
 
 import "./AdminSidebar.scss";
 import { useAppDispatch } from "../../../hooks/reduxHooks";
 import { logout } from "../../../redux/thunks/UserAuthServices";
 
 const menuItems = [
-  { title: "Dashboard", icon: BarChart2, path: "/admin/dashboard" },
   {
     title: "Category Management",
     icon: SquareStack,

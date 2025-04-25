@@ -49,7 +49,7 @@ const AdminLogin: React.FC = () => {
       ).unwrap();
 
       if (response.success === true) {
-        navigate("/admin/dashboard");
+        navigate("/admin/location-management");
         resetForm();
       }
     }
