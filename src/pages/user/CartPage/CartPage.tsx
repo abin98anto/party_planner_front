@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import "./CartPage.scss";
-import { axiosInstance } from "../../../config/axiosConfig";
+import axiosInstance from "../../../config/axiosConfig";
 import { useAppSelector } from "../../../hooks/reduxHooks";
 import IAddress from "../../../entities/IAddress";
 import { Pencil, Plus, ShoppingCart, Trash2 } from "lucide-react";

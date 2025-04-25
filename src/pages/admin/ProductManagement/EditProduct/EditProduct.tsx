@@ -1,7 +1,7 @@
 import type React from "react";
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { axiosInstance } from "../../../../config/axiosConfig";
+import axiosInstance  from "../../../../config/axiosConfig";
 import handleFileUpload, {
   validateImageFile,
 } from "../../../../shared/fileUpload";

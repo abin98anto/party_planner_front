@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Box, Typography, TextField, Button } from "@mui/material";
 import "./ProviderManagement.scss";
-import { axiosInstance } from "../../../config/axiosConfig";
+import axiosInstance from "../../../config/axiosConfig";
 import IProvider from "../../../entities/IProvider";
 import ILocation from "../../../entities/ILocation";
 

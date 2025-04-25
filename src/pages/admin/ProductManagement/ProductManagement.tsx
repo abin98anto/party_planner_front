@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import IProduct from "../../../entities/IProduct";
 import ICategory from "../../../entities/ICategory";
 import "./ProductManagement.scss";
-import { axiosInstance } from "../../../config/axiosConfig";
+import axiosInstance from "../../../config/axiosConfig";
 
 const ProductManagement: React.FC = () => {
   const navigate = useNavigate();

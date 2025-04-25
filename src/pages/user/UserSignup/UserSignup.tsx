@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./UserSignup.scss";
-import { axiosInstance } from "../../../config/axiosConfig";
+import axiosInstance from "../../../config/axiosConfig";
 
 const UserSignup: React.FC = () => {
   const [fullName, setFullName] = useState("");

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Box, Typography, TextField, Button } from "@mui/material";
 import ICategory from "../../../entities/ICategory";
 import "./CategoryManagement.scss";
-import { axiosInstance } from "../../../config/axiosConfig";
+import axiosInstance from "../../../config/axiosConfig";
 
 const CategoryManagement: React.FC = () => {
   const [categories, setCategories] = useState<ICategory[]>([]);

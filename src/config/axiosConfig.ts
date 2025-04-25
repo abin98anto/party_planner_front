@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 
-export const axiosInstance: AxiosInstance = axios.create({
+const axiosInstance: AxiosInstance = axios.create({
   baseURL: "https://party-planner-nodejs.onrender.com",
   withCredentials: true,
   headers: {
@@ -29,3 +29,5 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+export default axiosInstance;

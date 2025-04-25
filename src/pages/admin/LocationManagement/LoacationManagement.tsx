@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Box, Typography, TextField, Button } from "@mui/material";
 import ILocation from "../../../entities/ILocation";
 import "./LocationManagement.scss";
-import { axiosInstance } from "../../../config/axiosConfig";
+import axiosInstance from "../../../config/axiosConfig";
 
 const LocationManagement: React.FC = () => {
   const [locations, setLocations] = useState<ILocation[]>([]);

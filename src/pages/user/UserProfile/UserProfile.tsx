@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import "./UserProfile.scss";
 import ILocation from "../../../entities/ILocation";
-import { axiosInstance } from "../../../config/axiosConfig";
+import axiosInstance from "../../../config/axiosConfig";
 import ICategory from "../../../entities/ICategory";
 import IProvider from "../../../entities/IProvider";
 import { useAppSelector } from "../../../hooks/reduxHooks";

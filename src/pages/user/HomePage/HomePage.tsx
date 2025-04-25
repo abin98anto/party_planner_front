@@ -9,7 +9,7 @@ import {
   Camera,
 } from "lucide-react";
 import "./HomePage.scss";
-import { axiosInstance } from "../../../config/axiosConfig";
+import axiosInstance from "../../../config/axiosConfig";
 
 interface ILocation {
   _id?: string;

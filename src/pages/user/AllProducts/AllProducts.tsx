@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import "./AllProducts.scss";
 import ICategory from "../../../entities/ICategory";
 import IProvider from "../../../entities/IProvider";
-import { axiosInstance } from "../../../config/axiosConfig";
+import axiosInstance from "../../../config/axiosConfig";
 import ILocation from "../../../entities/ILocation";
 import CalendarNew from "./calendar-new";
 import { useNavigate } from "react-router-dom";

@@ -4,7 +4,7 @@ import "./OrderManagement.scss";
 import ICategory from "../../../entities/ICategory";
 import IProvider from "../../../entities/IProvider";
 import ILocation from "../../../entities/ILocation";
-import { axiosInstance } from "../../../config/axiosConfig";
+import axiosInstance from "../../../config/axiosConfig";
 
 interface Product {
   _id: string;
