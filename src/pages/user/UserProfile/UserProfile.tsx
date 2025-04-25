@@ -63,7 +63,7 @@ const UserProfile: React.FC = () => {
 
       const response = await axiosInstance.get(`/order/${userId}`);
       if (response.data.success) {
-        setOrders(response.data.data);
+        setOrders(response.data.data || []);
       } else {
         throw new Error(response.data.message || "Failed to fetch orders");
       }
