@@ -61,7 +61,7 @@ const UserProfile: React.FC = () => {
         throw new Error("User ID not found");
       }
 
-      const response = await axiosInstance.get(`/order/${userId}`);
+      const response = await axiosInstance.get(`/order/user/${userId}`);
       console.log("the response (user profile)", response);
       if (response.data.success) {
         setOrders(response.data.data || []);
