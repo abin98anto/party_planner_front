@@ -13,13 +13,15 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   async (error) => {
+    console.log("refreshing access token");
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        await axiosInstance.post("/refresh-token");
+        const response = await axiosInstance.post("/refresh-token");
+        console.log("the interceprot respon", response);
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         console.error("Failed to refresh token:", refreshError);
