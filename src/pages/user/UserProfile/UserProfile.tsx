@@ -62,6 +62,7 @@ const UserProfile: React.FC = () => {
       }
 
       const response = await axiosInstance.get(`/order/${userId}`);
+      console.log("the response (user profile)", response);
       if (response.data.success) {
         setOrders(response.data.data || []);
       } else {
