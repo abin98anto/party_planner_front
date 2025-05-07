@@ -4,6 +4,7 @@ import ICategory from "../../../entities/ICategory";
 import "./CategoryManagement.scss";
 import axiosInstance from "../../../config/axiosConfig";
 import { AxiosError } from "axios";
+import Swal from "sweetalert2";
 
 const CategoryManagement: React.FC = () => {
   const [categories, setCategories] = useState<ICategory[]>([]);
@@ -27,10 +28,45 @@ const CategoryManagement: React.FC = () => {
       setCategories(data);
     } catch (error) {
       console.error("Error fetching categories:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to fetch categories. Please try again later.",
+      });
     }
   };
 
+  // Check if category name already exists
+  const checkDuplicateName = (name: string, currentId?: string): boolean => {
+    return categories.some(
+      (category) =>
+        category.name.toLowerCase() === name.toLowerCase() &&
+        category._id !== currentId &&
+        !category.isDeleted
+    );
+  };
+
   const handleAddCategory = async (): Promise<void> => {
+    // Check for empty field
+    if (!categoryName.trim()) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Category name cannot be empty!",
+      });
+      return;
+    }
+
+    // Check for duplicate name
+    if (checkDuplicateName(categoryName)) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Category name already exists!",
+      });
+      return;
+    }
+
     try {
       const response = await axiosInstance.post("/category/add", {
         name: categoryName,
@@ -39,15 +75,47 @@ const CategoryManagement: React.FC = () => {
         setIsAddModalOpen(false);
         setCategoryName("");
         fetchCategories();
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Category added successfully!",
+        });
       }
     } catch (error) {
       if (error instanceof AxiosError) {
         console.error("Error adding category:", error.response?.data);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text:
+            error.response?.data?.message ||
+            "Failed to add category. Please try again.",
+        });
       }
     }
   };
 
   const handleEditCategory = async (): Promise<void> => {
+    // Check for empty field
+    if (!categoryName.trim()) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Category name cannot be empty!",
+      });
+      return;
+    }
+
+    // Check for duplicate name, excluding the current category
+    if (checkDuplicateName(categoryName, selectedCategory?._id)) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Category name already exists!",
+      });
+      return;
+    }
+
     try {
       const response = await axiosInstance.put("/category/update", {
         _id: selectedCategory?._id,
@@ -59,9 +127,19 @@ const CategoryManagement: React.FC = () => {
         setSelectedCategory(null);
         setCategoryName("");
         fetchCategories();
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Category updated successfully!",
+        });
       }
     } catch (error) {
       console.error("Error updating category:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to update category. Please try again.",
+      });
     }
   };
 
@@ -76,9 +154,19 @@ const CategoryManagement: React.FC = () => {
         setIsDeleteModalOpen(false);
         setSelectedCategory(null);
         fetchCategories();
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Category deleted successfully!",
+        });
       }
     } catch (error) {
       console.log("Error deleting category", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to delete category. Please try again.",
+      });
     }
   };
 
@@ -96,9 +184,21 @@ const CategoryManagement: React.FC = () => {
         setIsListModalOpen(false);
         setSelectedCategory(null);
         fetchCategories();
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: `Category ${
+            newActiveStatus ? "listed" : "unlisted"
+          } successfully!`,
+        });
       }
     } catch (error) {
       console.error("Error updating category list status:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to update category status. Please try again.",
+      });
     }
   };
 
