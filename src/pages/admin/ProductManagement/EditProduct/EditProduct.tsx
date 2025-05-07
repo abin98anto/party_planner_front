@@ -74,13 +74,14 @@ const EditProduct: React.FC = () => {
   const fetchProductDetails = async (): Promise<void> => {
     try {
       if (!productId) {
+        console.log("no roduct id");
         setError("Product ID is missing");
         return;
       }
 
       const response = await axiosInstance.get(`/product/${productId}`);
-      const productData = response.data.data;
       console.log("product data", response);
+      const productData = response.data.data;
       const formattedDates = productData.datesAvailable.map(
         (date: string | Date) => new Date(date)
       );
