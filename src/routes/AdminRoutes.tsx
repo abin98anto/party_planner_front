@@ -10,6 +10,7 @@ import AddProduct from "../pages/admin/ProductManagement/AddProduct/AddProduct";
 import LocationManagement from "../pages/admin/LocationManagement/LoacationManagement";
 import UnProtectedRoute from "../components/common/ProtectedRoutes/UnProtectedRoute";
 import ProtectedRoute from "../components/common/ProtectedRoutes/ProtectedRoutes";
+import EditProduct from "../pages/admin/ProductManagement/EditProduct/EditProduct";
 
 const AdminRoutes = () => {
   return (
@@ -24,7 +25,7 @@ const AdminRoutes = () => {
           <Route path="/location-management" element={<LocationManagement />} />
           <Route path="/product-management" element={<ProductManagement />} />
           <Route path="/add-product" element={<AddProduct />} />
-          <Route path="/edit-product/:productId" element={<AddProduct />} />
+          <Route path="/edit-product/:productId" element={<EditProduct />} />
           <Route path="/order-management" element={<OrderManagement />} />
           <Route path="/provider-management" element={<ProviderManagement />} />
           <Route path="*" element={<NotFound />} />
