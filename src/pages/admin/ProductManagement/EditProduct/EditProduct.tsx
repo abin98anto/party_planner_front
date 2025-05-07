@@ -39,13 +39,14 @@ const EditProduct: React.FC = () => {
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
-
+      console.log("gonna load");
       try {
         await Promise.all([
           fetchCategories(),
           fetchProviders(),
           fetchProductDetails(),
         ]);
+        console.log("product form", productForm);
       } catch (err) {
         setError("Failed to load product data. Please try again.");
         console.error("Error loading data:", err);
