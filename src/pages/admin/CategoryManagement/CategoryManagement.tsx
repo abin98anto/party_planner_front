@@ -3,6 +3,7 @@ import { Modal, Box, Typography, TextField, Button } from "@mui/material";
 import ICategory from "../../../entities/ICategory";
 import "./CategoryManagement.scss";
 import axiosInstance from "../../../config/axiosConfig";
+import { AxiosError } from "axios";
 
 const CategoryManagement: React.FC = () => {
   const [categories, setCategories] = useState<ICategory[]>([]);
@@ -40,7 +41,9 @@ const CategoryManagement: React.FC = () => {
         fetchCategories();
       }
     } catch (error) {
-      console.error("Error adding category:", error);
+      if (error instanceof AxiosError) {
+        console.error("Error adding category:", error.response?.data);
+      }
     }
   };
 
@@ -81,7 +84,6 @@ const CategoryManagement: React.FC = () => {
 
   const handleToggleListStatus = async (): Promise<void> => {
     try {
-      // Toggle the isActive status
       const newActiveStatus =
         selectedCategory?.isActive === true ? false : true;
 
