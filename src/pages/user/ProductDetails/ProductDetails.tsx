@@ -92,7 +92,6 @@ const ProductDetails: React.FC = () => {
       setFetchError(null);
 
       const productResponse = await axiosInstance.get(`/product/${productId}`);
-      console.log("product response", productResponse);
       const productData = productResponse.data.data;
       setProduct(productData);
     } catch (err) {
