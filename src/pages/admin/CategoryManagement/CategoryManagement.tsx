@@ -1,11 +1,29 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
-import { Modal, Box, Typography, TextField, Button } from "@mui/material";
+import {
+  Modal,
+  Box,
+  Typography,
+  TextField,
+  Button,
+  InputAdornment,
+  IconButton,
+  Pagination,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import ICategory from "../../../entities/ICategory";
 import "./CategoryManagement.scss";
 import axiosInstance from "../../../config/axiosConfig";
 import { AxiosError } from "axios";
 import useSnackbar from "../../../hooks/useSnackbar";
 import CustomSnackbar from "../../../components/common/CustomSanckbar/CustomSnackbar";
+
+interface IPaginationData {
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  limit: number;
+}
 
 const CategoryManagement: React.FC = () => {
   const [categories, setCategories] = useState<ICategory[]>([]);
@@ -17,17 +35,34 @@ const CategoryManagement: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(
     null
   );
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [pagination, setPagination] = useState<IPaginationData>({
+    totalCount: 0,
+    totalPages: 0,
+    currentPage: 1,
+    limit: 10,
+  });
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [pagination.currentPage]);
 
-  const fetchCategories = async (): Promise<void> => {
+  const fetchCategories = async (
+    search: string = searchTerm
+  ): Promise<void> => {
     try {
-      const response = await axiosInstance.get("/category");
-      const data: ICategory[] = await response.data.data;
+      const response = await axiosInstance.get("/category", {
+        params: {
+          page: pagination.currentPage,
+          limit: pagination.limit,
+          search: search,
+        },
+      });
+
+      const { data, pagination: paginationData } = response.data;
       setCategories(data);
+      setPagination(paginationData);
     } catch (error) {
       console.error("Error fetching categories:", error);
       showSnackbar(
@@ -37,7 +72,25 @@ const CategoryManagement: React.FC = () => {
     }
   };
 
-  // Check if category name already exists
+  const handleSearch = () => {
+    // Reset to first page when searching
+    setPagination((prev) => ({
+      ...prev,
+      currentPage: 1,
+    }));
+    fetchCategories(searchTerm);
+  };
+
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    setPagination((prev) => ({
+      ...prev,
+      currentPage: value,
+    }));
+  };
+
   const checkDuplicateName = (name: string, currentId?: string): boolean => {
     return categories.some(
       (category) =>
@@ -48,13 +101,11 @@ const CategoryManagement: React.FC = () => {
   };
 
   const handleAddCategory = async (): Promise<void> => {
-    // Check for empty field
     if (!categoryName.trim()) {
       showSnackbar("Category name cannot be empty!", "error");
       return;
     }
 
-    // Check for duplicate name
     if (checkDuplicateName(categoryName)) {
       showSnackbar("Category name already exists!", "error");
       return;
@@ -83,13 +134,11 @@ const CategoryManagement: React.FC = () => {
   };
 
   const handleEditCategory = async (): Promise<void> => {
-    // Check for empty field
     if (!categoryName.trim()) {
       showSnackbar("Category name cannot be empty!", "error");
       return;
     }
 
-    // Check for duplicate name, excluding the current category
     if (checkDuplicateName(categoryName, selectedCategory?._id)) {
       showSnackbar("Category name already exists!", "error");
       return;
@@ -161,6 +210,12 @@ const CategoryManagement: React.FC = () => {
     }
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   const openEditModal = (category: ICategory): void => {
     setSelectedCategory(category);
     setCategoryName(category.name);
@@ -196,16 +251,40 @@ const CategoryManagement: React.FC = () => {
         <div className="category-container">
           <div className="header">
             <h1>Category Management</h1>
-            <Button
-              variant="contained"
-              className="add-button"
-              onClick={() => {
-                setCategoryName("");
-                setIsAddModalOpen(true);
-              }}
-            >
-              Add Category
-            </Button>
+            <div className="top-controls">
+              <div className="search-container">
+                <TextField
+                  className="search-input"
+                  placeholder="Search categories..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={handleSearch}
+                          edge="end"
+                          className="search-button"
+                        >
+                          <SearchIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </div>
+              <Button
+                variant="contained"
+                className="add-button"
+                onClick={() => {
+                  setCategoryName("");
+                  setIsAddModalOpen(true);
+                }}
+              >
+                Add Category
+              </Button>
+            </div>
           </div>
 
           {categories.length === 0 ? (
@@ -267,6 +346,17 @@ const CategoryManagement: React.FC = () => {
                   ))}
                 </tbody>
               </table>
+
+              {/* Pagination */}
+              <div className="pagination-container">
+                <Pagination
+                  count={pagination.totalPages}
+                  page={pagination.currentPage}
+                  onChange={handlePageChange}
+                  color="primary"
+                  size="large"
+                />
+              </div>
             </div>
           )}
         </div>
