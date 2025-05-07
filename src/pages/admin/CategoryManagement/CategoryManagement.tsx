@@ -73,7 +73,6 @@ const CategoryManagement: React.FC = () => {
   };
 
   const handleSearch = () => {
-    // Reset to first page when searching
     setPagination((prev) => ({
       ...prev,
       currentPage: 1,

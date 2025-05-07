@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import "./ProductDetails.scss";
-import axiosInstance  from "../../../config/axiosConfig";
+import axiosInstance from "../../../config/axiosConfig";
 import { useParams } from "react-router-dom";
 import ILocation from "../../../entities/ILocation";
 import ICategory from "../../../entities/ICategory";
@@ -92,6 +92,7 @@ const ProductDetails: React.FC = () => {
       setFetchError(null);
 
       const productResponse = await axiosInstance.get(`/product/${productId}`);
+      console.log("product response", productResponse);
       const productData = productResponse.data.data;
       setProduct(productData);
     } catch (err) {
