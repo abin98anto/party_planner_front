@@ -63,6 +63,7 @@ const AddProduct: React.FC = () => {
     try {
       const response = await axiosInstance.get(`/product/${id}`);
       const productData = response.data.data;
+      console.log("the produ data in add produts", productData);
       setProductForm({
         ...productData,
         providerId: productData.providerId || "", // Add provider ID if it exists
