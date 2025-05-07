@@ -9,7 +9,7 @@ import type ICategory from "../../../../entities/ICategory";
 import type IProvider from "../../../../entities/IProvider";
 import type IProduct from "../../../../entities/IProduct";
 import Calendar from "../AddProduct/calender";
-import "./AddProduct.scss";
+import "../AddProduct/AddProduct.scss";
 
 const EditProduct: React.FC = () => {
   const { productId } = useParams();
