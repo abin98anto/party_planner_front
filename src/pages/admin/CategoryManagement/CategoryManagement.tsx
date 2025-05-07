@@ -40,7 +40,7 @@ const CategoryManagement: React.FC = () => {
     totalCount: 0,
     totalPages: 0,
     currentPage: 1,
-    limit: 10,
+    limit:6,
   });
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
 
