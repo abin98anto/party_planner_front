@@ -1,7 +1,7 @@
 import type React from "react";
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axiosInstance  from "../../../../config/axiosConfig";
+import axiosInstance from "../../../../config/axiosConfig";
 import handleFileUpload, {
   validateImageFile,
 } from "../../../../shared/fileUpload";
@@ -80,7 +80,7 @@ const EditProduct: React.FC = () => {
     try {
       const response = await axiosInstance.get(`/product/${productId}`);
       const productData = response.data.data;
-
+      console.log("product data", productData);
       const formattedDates = productData.datesAvailable.map(
         (date: string | Date) => new Date(date)
       );
