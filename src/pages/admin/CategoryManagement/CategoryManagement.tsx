@@ -82,7 +82,7 @@ const CategoryManagement: React.FC = () => {
   };
 
   const handlePageChange = (
-    event: React.ChangeEvent<unknown>,
+    _event: React.ChangeEvent<unknown>,
     value: number
   ) => {
     setPagination((prev) => ({
