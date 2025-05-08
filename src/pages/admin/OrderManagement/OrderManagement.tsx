@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import "./OrderManagement.scss";
 import ICategory from "../../../entities/ICategory";
@@ -53,7 +52,7 @@ const OrderManagement: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [totalOrders, setTotalOrders] = useState<number>(0);
+  const [_totalOrders, setTotalOrders] = useState<number>(0);
   const [status, setStatus] = useState<OrderStatus>("ALL");
   const [itemsPerPage] = useState<number>(8);
 
@@ -98,14 +97,13 @@ const OrderManagement: React.FC = () => {
 
   const handleStatusChange = (newStatus: OrderStatus) => {
     setStatus(newStatus);
-    setCurrentPage(1); // Reset to first page when filter changes
+    setCurrentPage(1);
   };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
-  // Format date to be more readable
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -114,9 +112,8 @@ const OrderManagement: React.FC = () => {
     });
   };
 
-  // Generate pagination array
   const generatePaginationArray = (): number[] => {
-    const delta = 2; // Number of pages to show before and after current page
+    const delta = 2;
     const range: number[] = [];
 
     for (
@@ -127,16 +124,15 @@ const OrderManagement: React.FC = () => {
       range.push(i);
     }
 
-    // Add first and last page
     if (currentPage - delta > 2) {
-      range.unshift(-1); // Ellipsis indicator
+      range.unshift(-1);
     }
     if (totalPages > 1) {
       range.unshift(1);
     }
 
     if (currentPage + delta < totalPages - 1) {
-      range.push(-1); // Ellipsis indicator
+      range.push(-1);
     }
     if (totalPages > 1 && !range.includes(totalPages)) {
       range.push(totalPages);
@@ -271,10 +267,6 @@ const OrderManagement: React.FC = () => {
                 </button>
               </div>
             )}
-
-            <div className="order-count">
-              Showing {orders.length} of {totalOrders} orders
-            </div>
           </>
         )}
       </div>
