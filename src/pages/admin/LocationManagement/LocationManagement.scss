@@ -19,20 +19,64 @@
         font-size: 2rem;
       }
 
-      .add-button {
-        background-color: #ff5722;
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 4px;
-        font-size: 0.875rem;
-        cursor: pointer;
+      .top-controls {
         display: flex;
-        justify-content: center;
-        gap: 0.5rem;
+        justify-content: space-between;
+        width: 100%;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
 
-        &:hover {
-          background-color: #f4511e;
+        .search-container {
+          flex: 1;
+          max-width: 400px;
+
+          .search-input {
+            background-color: #333;
+            border-radius: 4px;
+            width: 100%;
+
+            .MuiInputBase-root {
+              color: white;
+            }
+
+            .MuiOutlinedInput-root {
+              &:hover .MuiOutlinedInput-notchedOutline {
+                border-color: #555;
+              }
+              &.Mui-focused .MuiOutlinedInput-notchedOutline {
+                border-color: #ff5722;
+              }
+            }
+
+            .MuiOutlinedInput-notchedOutline {
+              border-color: #444;
+            }
+
+            .search-button {
+              color: #ff5722;
+              &:hover {
+                background-color: rgba(255, 87, 34, 0.1);
+              }
+            }
+          }
+        }
+
+        .add-button {
+          background-color: #ff5722;
+          color: white;
+          border: none;
+          padding: 0.5rem 1rem;
+          border-radius: 4px;
+          font-size: 0.875rem;
+          cursor: pointer;
+          display: flex;
+          justify-content: center;
+          gap: 0.5rem;
+
+          &:hover {
+            background-color: #f4511e;
+          }
         }
       }
     }
@@ -71,6 +115,27 @@
 
       td {
         border-bottom: 1px solid #444;
+      }
+    }
+
+    .pagination-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+
+      .MuiPagination-root {
+        .MuiPaginationItem-root {
+          color: white;
+
+          &.Mui-selected {
+            background-color: #ff5722;
+          }
+
+          &:hover {
+            background-color: rgba(255, 87, 34, 0.2);
+          }
+        }
       }
     }
   }
