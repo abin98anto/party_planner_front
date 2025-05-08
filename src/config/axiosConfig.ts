@@ -1,7 +1,8 @@
 import axios, { AxiosInstance } from "axios";
 
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: "https://party-planner-nodejs.onrender.com",
+  // baseURL: "https://party-planner-nodejs.onrender.com",
+  baseURL: "http://localhost:5000",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",

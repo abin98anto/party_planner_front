@@ -40,7 +40,7 @@ const CategoryManagement: React.FC = () => {
     totalCount: 0,
     totalPages: 0,
     currentPage: 1,
-    limit:6,
+    limit: 6,
   });
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
 
@@ -100,17 +100,17 @@ const CategoryManagement: React.FC = () => {
   };
 
   const handleAddCategory = async (): Promise<void> => {
-    if (!categoryName.trim()) {
-      showSnackbar("Category name cannot be empty!", "error");
-      return;
-    }
-
-    if (checkDuplicateName(categoryName)) {
-      showSnackbar("Category name already exists!", "error");
-      return;
-    }
-
     try {
+      if (!categoryName.trim()) {
+        showSnackbar("Category name cannot be empty!", "error");
+        return;
+      }
+
+      if (checkDuplicateName(categoryName)) {
+        showSnackbar("Category name already exists!", "error");
+        return;
+      }
+
       const response = await axiosInstance.post("/category/add", {
         name: categoryName,
       });
