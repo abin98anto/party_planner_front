@@ -16,14 +16,12 @@ const AdminLogin: React.FC = () => {
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
 
-    // Email validation
     if (!email) {
       newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = "Please enter a valid email address";
     }
 
-    // Password validation
     if (!password) {
       newErrors.password = "Password is required";
     } else if (password.length < 6) {

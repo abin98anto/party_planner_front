@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import {
   Modal,
@@ -13,10 +12,14 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import ICategory from "../../../entities/ICategory";
 import "./CategoryManagement.scss";
-import axiosInstance from "../../../config/axiosConfig";
 import { AxiosError } from "axios";
 import useSnackbar from "../../../hooks/useSnackbar";
 import CustomSnackbar from "../../../components/common/CustomSanckbar/CustomSnackbar";
+import {
+  addCategory,
+  getAllCategories,
+  updateCategory,
+} from "../../../api/services/categoryService";
 
 interface IPaginationData {
   totalCount: number;
@@ -52,17 +55,18 @@ const CategoryManagement: React.FC = () => {
     search: string = searchTerm
   ): Promise<void> => {
     try {
-      const response = await axiosInstance.get("/category", {
-        params: {
-          page: pagination.currentPage,
-          limit: pagination.limit,
-          search: search,
-        },
-      });
+      const params = {
+        page: pagination.currentPage,
+        limit: pagination.limit,
+        search: search,
+      };
 
-      const { data, pagination: paginationData } = response.data;
-      setCategories(data);
-      setPagination(paginationData);
+      const response = await getAllCategories(params);
+      if (response?.success) {
+        const { data, pagination } = response;
+        setCategories(data);
+        setPagination(pagination);
+      }
     } catch (error) {
       console.error("Error fetching categories:", error);
       showSnackbar(
@@ -111,15 +115,13 @@ const CategoryManagement: React.FC = () => {
         return;
       }
 
-      const response = await axiosInstance.post("/category/add", {
-        name: categoryName,
-      });
-      if (response) {
-        setIsAddModalOpen(false);
-        setCategoryName("");
-        fetchCategories();
-        showSnackbar("Category added successfully!", "success");
-      }
+      await addCategory({ name: categoryName });
+      // if (response) {
+      setIsAddModalOpen(false);
+      setCategoryName("");
+      fetchCategories();
+      showSnackbar("Category added successfully!", "success");
+      // }
     } catch (error) {
       if (error instanceof AxiosError) {
         console.error("Error adding category:", error.response?.data);
@@ -144,12 +146,12 @@ const CategoryManagement: React.FC = () => {
     }
 
     try {
-      const response = await axiosInstance.put("/category/update", {
+      const response = await updateCategory({
         _id: selectedCategory?._id,
         name: categoryName,
       });
 
-      if (response.status === 200) {
+      if (response) {
         setIsEditModalOpen(false);
         setSelectedCategory(null);
         setCategoryName("");
@@ -164,12 +166,12 @@ const CategoryManagement: React.FC = () => {
 
   const handleDeleteCategory = async (): Promise<void> => {
     try {
-      const response = await axiosInstance.put("/category/update", {
+      const response = await updateCategory({
         _id: selectedCategory?._id,
         isDeleted: true,
       });
 
-      if (response.status === 200) {
+      if (response) {
         setIsDeleteModalOpen(false);
         setSelectedCategory(null);
         fetchCategories();
@@ -186,12 +188,12 @@ const CategoryManagement: React.FC = () => {
       const newActiveStatus =
         selectedCategory?.isActive === true ? false : true;
 
-      const response = await axiosInstance.put("/category/update", {
+      const response = await updateCategory({
         _id: selectedCategory?._id,
         isActive: newActiveStatus,
       });
 
-      if (response.status === 200) {
+      if (response) {
         setIsListModalOpen(false);
         setSelectedCategory(null);
         fetchCategories();
