@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./OrderManagement.scss";
-import ICategory from "../../../entities/ICategory";
-import IProvider from "../../../entities/IProvider";
-import ILocation from "../../../entities/ILocation";
 import axiosInstance from "../../../config/axiosConfig";
 import EditIcon from "@mui/icons-material/Edit";
 import {
@@ -17,49 +14,8 @@ import {
   IconButton,
   Pagination,
 } from "@mui/material";
-import IUser from "../../../entities/IUser";
-
-interface Product {
-  _id: string;
-  name: string;
-  description: string;
-  categoryId: ICategory;
-  providerId: IProvider;
-  images: string[];
-  price: number;
-  datesAvailable: string[];
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-interface SelectedProduct {
-  productId: Product;
-  selectedDates: Date[];
-  locationId: ILocation;
-}
-
-interface Order {
-  _id: string;
-  userId: IUser;
-  productIds: SelectedProduct[];
-  providerIds: string[];
-  amount: number;
-  address: string;
-  status: "PENDING" | "CANCELLED" | "COMPLETED";
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface OrdersResponse {
-  success: boolean;
-  data: Order[];
-  pagination: {
-    totalPages: number;
-    currentPage: number;
-    totalOrders: number;
-    limit: number;
-  };
-}
+import { getAllOrders } from "../../../api/services/orderService";
+import { Order, OrderRequestParams } from "../../../api/types/orderTypes";
 
 type OrderStatus = "ALL" | "PENDING" | "CANCELLED" | "COMPLETED";
 
@@ -87,23 +43,22 @@ const OrderManagement: React.FC = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const queryParams = new URLSearchParams({
-        page: currentPage.toString(),
-        limit: itemsPerPage.toString(),
-      });
+
+      const queryParams: OrderRequestParams = {
+        page: currentPage,
+        limit: itemsPerPage,
+      };
 
       if (status !== "ALL") {
-        queryParams.append("status", status);
+        queryParams.status = status;
       }
 
-      const response = await axiosInstance.get<OrdersResponse>(
-        `/order?${queryParams}`
-      );
+      const response = await getAllOrders(queryParams);
 
-      if (response.data.success) {
-        setOrders(response.data.data);
-        setTotalPages(response.data.pagination.totalPages);
-        setTotalOrders(response.data.pagination.totalOrders);
+      if (response.success && Array.isArray(response.data)) {
+        setOrders(response.data as Order[]);
+        setTotalPages(response.pagination.totalPages);
+        setTotalOrders(response.pagination.totalOrders);
       } else {
         throw new Error("Failed to fetch orders");
       }

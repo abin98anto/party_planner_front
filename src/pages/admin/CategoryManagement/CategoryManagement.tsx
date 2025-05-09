@@ -116,12 +116,10 @@ const CategoryManagement: React.FC = () => {
       }
 
       await addCategory({ name: categoryName });
-      // if (response) {
       setIsAddModalOpen(false);
       setCategoryName("");
       fetchCategories();
       showSnackbar("Category added successfully!", "success");
-      // }
     } catch (error) {
       if (error instanceof AxiosError) {
         console.error("Error adding category:", error.response?.data);

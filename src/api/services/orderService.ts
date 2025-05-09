@@ -1,13 +1,12 @@
 import axiosInstance from "../../config/axiosConfig";
 import { OrderRequestParams, OrderResponse } from "../types/orderTypes";
 
-export const fetchOrders = async (
+export const getAllOrders = async (
   params: OrderRequestParams
 ): Promise<OrderResponse> => {
   try {
     const response = await axiosInstance.get<OrderResponse>("/order", {
       params,
-      withCredentials: true,
     });
     return response.data;
   } catch (error: any) {

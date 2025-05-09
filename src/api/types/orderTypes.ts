@@ -1,6 +1,7 @@
 import ICategory from "../../entities/ICategory";
 import ILocation from "../../entities/ILocation";
 import IProvider from "../../entities/IProvider";
+import IUser from "../../entities/IUser";
 
 export interface Product {
   _id: string;
@@ -24,7 +25,7 @@ export interface SelectedProduct {
 
 export interface Order {
   _id: string;
-  userId: string;
+  userId: IUser;
   productIds: SelectedProduct[];
   providerIds: string[];
   amount: number;
