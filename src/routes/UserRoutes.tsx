@@ -18,15 +18,15 @@ const UserRoutes = () => {
         <Route element={<UserLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/products" element={<AllProducts />} />
-          <Route path="/product/:productId" element={<ProductDetails />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="*" element={<NotFound />} />
 
           <Route element={<UnProtectedRoute />}>
+            <Route path="/product/:productId" element={<ProductDetails />} />
             <Route path="/login" element={<UserLogin />} />
             <Route path="/signup" element={<UserSignup />} />
           </Route>
-          
+
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<UserProfile />} />
           </Route>

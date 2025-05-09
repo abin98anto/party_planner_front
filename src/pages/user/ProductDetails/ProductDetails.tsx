@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import "./ProductDetails.scss";
 import axiosInstance from "../../../config/axiosConfig";
