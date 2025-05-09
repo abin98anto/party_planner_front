@@ -172,42 +172,24 @@
     }
   }
 
-  .pagination {
+  .pagination-container {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 2rem 0;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
 
-    .pagination-btn {
-      background-color: #1e1e1e;
-      color: #aaa;
-      border: 1px solid #444;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.2s;
-
-      &:hover:not(:disabled) {
-        background-color: #333;
+    .MuiPagination-root {
+      .MuiPaginationItem-root {
         color: white;
-      }
 
-      &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
+        &.Mui-selected {
+          background-color: #ff5722;
+        }
 
-      &.active {
-        background-color: #ff5722;
-        color: white;
-        border-color: #ff5722;
+        &:hover {
+          background-color: rgba(255, 87, 34, 0.2);
+        }
       }
-    }
-
-    .ellipsis {
-      color: #aaa;
-      padding: 0 0.5rem;
     }
   }
 
@@ -216,5 +198,104 @@
     color: #aaa;
     font-size: 0.875rem;
     margin-bottom: 2rem;
+  }
+
+  .action-icon-button {
+    color: #3498db;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: rgba(52, 152, 219, 0.1);
+    }
+  }
+}
+
+.status-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  background-color: #2b2b2b;
+  border: 1px solid #444;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  padding: 1.5rem;
+  border-radius: 8px;
+
+  .modal-title {
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    color: white;
+  }
+
+  .form-control {
+    width: 100%;
+    margin-bottom: 1.5rem;
+
+    .input-label {
+      color: #aaa;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .status-select {
+      width: 100%;
+      background-color: #1e1e1e;
+      color: white;
+      border: 1px solid #444;
+      padding: 0.5rem;
+      border-radius: 4px;
+
+      &:focus {
+        border-color: #ff5722;
+        outline: none;
+      }
+
+      option {
+        background-color: #1e1e1e;
+      }
+    }
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+
+    .cancel-button {
+      background-color: transparent;
+      color: #aaa;
+      border: 1px solid #444;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: white;
+      }
+    }
+
+    .change-button {
+      background-color: #ff5722;
+      color: white;
+      border: 1px solid #ff5722;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background-color: #e64a19;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
   }
 }

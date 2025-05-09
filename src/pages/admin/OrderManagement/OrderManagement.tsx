@@ -4,6 +4,19 @@ import ICategory from "../../../entities/ICategory";
 import IProvider from "../../../entities/IProvider";
 import ILocation from "../../../entities/ILocation";
 import axiosInstance from "../../../config/axiosConfig";
+import EditIcon from "@mui/icons-material/Edit";
+import {
+  Modal,
+  Box,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+  IconButton,
+  Pagination,
+} from "@mui/material";
 
 interface Product {
   _id: string;
@@ -39,9 +52,12 @@ interface Order {
 interface OrdersResponse {
   success: boolean;
   data: Order[];
-  totalPages: number;
-  currentPage: number;
-  totalOrders: number;
+  pagination: {
+    totalPages: number;
+    currentPage: number;
+    totalOrders: number;
+    limit: number;
+  };
 }
 
 type OrderStatus = "ALL" | "PENDING" | "CANCELLED" | "COMPLETED";
@@ -54,7 +70,14 @@ const OrderManagement: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [_totalOrders, setTotalOrders] = useState<number>(0);
   const [status, setStatus] = useState<OrderStatus>("ALL");
-  const [itemsPerPage] = useState<number>(8);
+  const [itemsPerPage] = useState<number>(6);
+
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [newStatus, setNewStatus] = useState<
+    "PENDING" | "CANCELLED" | "COMPLETED"
+  >("PENDING");
+  const [updateLoading, setUpdateLoading] = useState<boolean>(false);
 
   useEffect(() => {
     fetchOrders();
@@ -78,8 +101,8 @@ const OrderManagement: React.FC = () => {
 
       if (response.data.success) {
         setOrders(response.data.data);
-        setTotalPages(response.data.totalPages);
-        setTotalOrders(response.data.totalOrders);
+        setTotalPages(response.data.pagination.totalPages);
+        setTotalOrders(response.data.pagination.totalOrders);
       } else {
         throw new Error("Failed to fetch orders");
       }
@@ -100,10 +123,6 @@ const OrderManagement: React.FC = () => {
     setCurrentPage(1);
   };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -112,33 +131,65 @@ const OrderManagement: React.FC = () => {
     });
   };
 
-  const generatePaginationArray = (): number[] => {
-    const delta = 2;
-    const range: number[] = [];
+  const handleOpenModal = (order: Order) => {
+    setSelectedOrder(order);
+    setNewStatus(order.status);
+    setIsModalOpen(true);
+  };
 
-    for (
-      let i = Math.max(2, currentPage - delta);
-      i <= Math.min(totalPages - 1, currentPage + delta);
-      i++
-    ) {
-      range.push(i);
-    }
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedOrder(null);
+  };
 
-    if (currentPage - delta > 2) {
-      range.unshift(-1);
-    }
-    if (totalPages > 1) {
-      range.unshift(1);
-    }
+  const handleUpdateStatus = async () => {
+    if (!selectedOrder) return;
 
-    if (currentPage + delta < totalPages - 1) {
-      range.push(-1);
-    }
-    if (totalPages > 1 && !range.includes(totalPages)) {
-      range.push(totalPages);
-    }
+    try {
+      setUpdateLoading(true);
+      const response = await axiosInstance.put(
+        `/order/update/${selectedOrder._id}`,
+        { status: newStatus }
+      );
 
-    return range;
+      if (response.data.success) {
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order._id === selectedOrder._id
+              ? { ...order, status: newStatus }
+              : order
+          )
+        );
+        handleCloseModal();
+      } else {
+        throw new Error("Failed to update order status");
+      }
+    } catch (err) {
+      console.error("Error updating order status:", err);
+      alert("Failed to update order status. Please try again.");
+    } finally {
+      setUpdateLoading(false);
+    }
+  };
+
+  const handlePageChange = (
+    _event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    setCurrentPage(value);
+  };
+
+  const modalStyle = {
+    position: "absolute" as "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "#2b2b2b",
+    border: "1px solid #444",
+    boxShadow: 24,
+    p: 4,
+    color: "white",
   };
 
   return (
@@ -206,6 +257,7 @@ const OrderManagement: React.FC = () => {
                     <th>Items</th>
                     <th>Status</th>
                     <th>Address</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -224,52 +276,123 @@ const OrderManagement: React.FC = () => {
                         </span>
                       </td>
                       <td className="address-cell">{order.address}</td>
+                      <td>
+                        {order.status === "PENDING" && (
+                          <IconButton
+                            onClick={() => handleOpenModal(order)}
+                            sx={{ color: "#3498db" }}
+                            size="small"
+                          >
+                            <EditIcon />
+                          </IconButton>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
 
-            {totalPages > 1 && (
-              <div className="pagination">
-                <button
-                  className="pagination-btn"
-                  disabled={currentPage === 1}
-                  onClick={() => handlePageChange(currentPage - 1)}
-                >
-                  Previous
-                </button>
-
-                {generatePaginationArray().map((page, index) =>
-                  page === -1 ? (
-                    <span key={`ellipsis-${index}`} className="ellipsis">
-                      ...
-                    </span>
-                  ) : (
-                    <button
-                      key={page}
-                      className={`pagination-btn ${
-                        currentPage === page ? "active" : ""
-                      }`}
-                      onClick={() => handlePageChange(page)}
-                    >
-                      {page}
-                    </button>
-                  )
-                )}
-
-                <button
-                  className="pagination-btn"
-                  disabled={currentPage === totalPages}
-                  onClick={() => handlePageChange(currentPage + 1)}
-                >
-                  Next
-                </button>
-              </div>
-            )}
+            {/* Pagination */}
+            <div className="pagination-container">
+              <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={handlePageChange}
+                color="primary"
+                size="large"
+              />
+            </div>
           </>
         )}
       </div>
+
+      {/* Status Update Modal */}
+      <Modal
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+      >
+        <Box sx={modalStyle}>
+          <Typography
+            id="modal-title"
+            variant="h6"
+            component="h2"
+            sx={{ mb: 2 }}
+          >
+            Update Order Status
+          </Typography>
+          <FormControl fullWidth sx={{ mb: 3 }}>
+            <InputLabel id="status-select-label" sx={{ color: "#aaa" }}>
+              Status
+            </InputLabel>
+            <Select
+              labelId="status-select-label"
+              id="status-select"
+              value={newStatus}
+              label="Status"
+              onChange={(e) =>
+                setNewStatus(
+                  e.target.value as "PENDING" | "CANCELLED" | "COMPLETED"
+                )
+              }
+              sx={{
+                color: "white",
+                ".MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#444",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#666",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#ff5722",
+                },
+                ".MuiSvgIcon-root": {
+                  color: "white",
+                },
+              }}
+            >
+              <MenuItem value="PENDING">PENDING</MenuItem>
+              <MenuItem value="CANCELLED">CANCELLED</MenuItem>
+              <MenuItem value="COMPLETED">COMPLETED</MenuItem>
+            </Select>
+          </FormControl>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+            <Button
+              onClick={handleCloseModal}
+              variant="outlined"
+              sx={{
+                color: "#aaa",
+                borderColor: "#444",
+                "&:hover": {
+                  borderColor: "#666",
+                  backgroundColor: "rgba(255,255,255,0.05)",
+                },
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUpdateStatus}
+              variant="contained"
+              disabled={updateLoading}
+              sx={{
+                backgroundColor: "#ff5722",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "#e64a19",
+                },
+                "&.Mui-disabled": {
+                  backgroundColor: "rgba(255,87,34,0.5)",
+                },
+              }}
+            >
+              {updateLoading ? "Updating..." : "Change"}
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </div>
   );
 };
