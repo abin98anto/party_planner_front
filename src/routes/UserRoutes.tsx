@@ -20,9 +20,9 @@ const UserRoutes = () => {
           <Route path="/products" element={<AllProducts />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="*" element={<NotFound />} />
+          <Route path="/product/:productId" element={<ProductDetails />} />
 
           <Route element={<UnProtectedRoute />}>
-            <Route path="/product/:productId" element={<ProductDetails />} />
             <Route path="/login" element={<UserLogin />} />
             <Route path="/signup" element={<UserSignup />} />
           </Route>
