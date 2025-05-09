@@ -73,6 +73,7 @@
 
   .form-field {
     width: 100%;
+    position: relative;
 
     label {
       display: block;
@@ -96,6 +97,17 @@
         border-color: #3182ce;
         box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
       }
+
+      /* Style for invalid inputs */
+      &.invalid {
+        border-color: #e53e3e;
+        background-color: #fff5f5;
+      }
+
+      &:disabled {
+        background-color: #edf2f7;
+        cursor: not-allowed;
+      }
     }
 
     textarea {
@@ -112,6 +124,14 @@
       background-size: 16px;
       padding-right: 2.5rem;
     }
+  }
+
+  /* Validation error message */
+  .validation-error {
+    color: #e53e3e;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
   }
 
   .section-container {
@@ -309,6 +329,11 @@
 
     &:hover {
       background-color: #2f855a;
+    }
+
+    &:disabled {
+      background-color: #9ae6b4;
+      cursor: not-allowed;
     }
   }
 }
