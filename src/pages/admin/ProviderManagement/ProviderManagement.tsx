@@ -24,6 +24,13 @@ interface IPaginationData {
   limit: number;
 }
 
+interface FormErrors {
+  name: string;
+  company: string;
+  contact: string;
+  locations: string;
+}
+
 const ProviderManagement: React.FC = () => {
   const [providers, setProviders] = useState<IProvider[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
@@ -33,13 +40,18 @@ const ProviderManagement: React.FC = () => {
   const [name, setName] = useState<string>("");
   const [company, setCompany] = useState<string>("");
   const [contact, setContact] = useState<number | string>("");
-  const [locationError, setLocationError] = useState<string>("");
   const [selectedProvider, setSelectedProvider] = useState<IProvider | null>(
     null
   );
   const [availableLocations, setAvailableLocations] = useState<ILocation[]>([]);
   const [selectedLocations, setSelectedLocations] = useState<ILocation[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [formErrors, setFormErrors] = useState<FormErrors>({
+    name: "",
+    company: "",
+    contact: "",
+    locations: "",
+  });
   const [pagination, setPagination] = useState<IPaginationData>({
     totalCount: 0,
     totalPages: 0,
@@ -168,7 +180,12 @@ const ProviderManagement: React.FC = () => {
     setCompany("");
     setContact("");
     setSelectedLocations([]);
-    setLocationError("");
+    setFormErrors({
+      name: "",
+      company: "",
+      contact: "",
+      locations: "",
+    });
   };
 
   const openEditModal = (provider: IProvider): void => {
@@ -177,6 +194,12 @@ const ProviderManagement: React.FC = () => {
     setCompany(provider.company);
     setContact(provider.contact);
     setSelectedLocations(provider.locations);
+    setFormErrors({
+      name: "",
+      company: "",
+      contact: "",
+      locations: "",
+    });
     setIsEditModalOpen(true);
   };
 
@@ -190,13 +213,48 @@ const ProviderManagement: React.FC = () => {
     setIsListModalOpen(true);
   };
 
-  const handleAddProvider = async (): Promise<void> => {
-    try {
-      if (selectedLocations.length === 0) {
-        setLocationError("At least one location is required");
-        return;
-      }
+  const validateForm = (): boolean => {
+    const errors: FormErrors = {
+      name: "",
+      company: "",
+      contact: "",
+      locations: "",
+    };
+    let isValid = true;
 
+    if (!name.trim()) {
+      errors.name = "Provider name is required";
+      isValid = false;
+    }
+
+    if (!company.trim()) {
+      errors.company = "Company name is required";
+      isValid = false;
+    }
+
+    if (!contact) {
+      errors.contact = "Contact number is required";
+      isValid = false;
+    } else if (!/^\d+$/.test(String(contact))) {
+      errors.contact = "Contact must be a valid number";
+      isValid = false;
+    }
+
+    if (selectedLocations.length === 0) {
+      errors.locations = "At least one location is required";
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid;
+  };
+
+  const handleAddProvider = async (): Promise<void> => {
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
       const response = await axiosInstance.post("/provider/add", {
         name,
         company,
@@ -216,12 +274,11 @@ const ProviderManagement: React.FC = () => {
   };
 
   const handleEditProvider = async (): Promise<void> => {
-    try {
-      if (selectedLocations.length === 0) {
-        setLocationError("At least one location is required");
-        return;
-      }
+    if (!validateForm()) {
+      return;
+    }
 
+    try {
       const response = await axiosInstance.put("/provider/update", {
         _id: selectedProvider?._id,
         name,
@@ -256,8 +313,11 @@ const ProviderManagement: React.FC = () => {
       }
     });
 
-    if (locationError && selectedLocations.length > 0) {
-      setLocationError("");
+    if (formErrors.locations && selectedLocations.length > 0) {
+      setFormErrors((prev) => ({
+        ...prev,
+        locations: "",
+      }));
     }
   };
 
@@ -431,42 +491,72 @@ const ProviderManagement: React.FC = () => {
             </Typography>
             <TextField
               fullWidth
-              label="Provider Name"
+              label="Provider Name*"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                if (e.target.value.trim()) {
+                  setFormErrors((prev) => ({ ...prev, name: "" }));
+                }
+              }}
               margin="normal"
+              error={!!formErrors.name}
+              helperText={formErrors.name}
               InputLabelProps={{
                 style: { color: "#aaa" },
               }}
               InputProps={{
                 style: { color: "white" },
               }}
+              FormHelperTextProps={{
+                style: { color: "#f44336" },
+              }}
             />
             <TextField
               fullWidth
-              label="Company Name"
+              label="Company Name*"
               value={company}
-              onChange={(e) => setCompany(e.target.value)}
+              onChange={(e) => {
+                setCompany(e.target.value);
+                if (e.target.value.trim()) {
+                  setFormErrors((prev) => ({ ...prev, company: "" }));
+                }
+              }}
               margin="normal"
+              error={!!formErrors.company}
+              helperText={formErrors.company}
               InputLabelProps={{
                 style: { color: "#aaa" },
               }}
               InputProps={{
                 style: { color: "white" },
               }}
+              FormHelperTextProps={{
+                style: { color: "#f44336" },
+              }}
             />
             <TextField
               fullWidth
-              label="Contact Number"
+              label="Contact Number*"
               value={contact}
-              onChange={(e) => setContact(e.target.value)}
+              onChange={(e) => {
+                setContact(e.target.value);
+                if (e.target.value && /^\d+$/.test(e.target.value)) {
+                  setFormErrors((prev) => ({ ...prev, contact: "" }));
+                }
+              }}
               margin="normal"
               type="number"
+              error={!!formErrors.contact}
+              helperText={formErrors.contact}
               InputLabelProps={{
                 style: { color: "#aaa" },
               }}
               InputProps={{
                 style: { color: "white" },
+              }}
+              FormHelperTextProps={{
+                style: { color: "#f44336" },
               }}
             />
             <Typography
@@ -475,16 +565,18 @@ const ProviderManagement: React.FC = () => {
             >
               Locations*
             </Typography>
-            {locationError && (
+            {formErrors.locations && (
               <Typography color="error" variant="caption">
-                {locationError}
+                {formErrors.locations}
               </Typography>
             )}
             <Box
               sx={{
                 maxHeight: "150px",
                 overflowY: "auto",
-                border: locationError ? "1px solid #f44336" : "1px solid #555",
+                border: formErrors.locations
+                  ? "1px solid #f44336"
+                  : "1px solid #555",
                 borderRadius: 1,
                 p: 1,
               }}
@@ -546,42 +638,72 @@ const ProviderManagement: React.FC = () => {
             </Typography>
             <TextField
               fullWidth
-              label="Provider Name"
+              label="Provider Name*"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                if (e.target.value.trim()) {
+                  setFormErrors((prev) => ({ ...prev, name: "" }));
+                }
+              }}
               margin="normal"
+              error={!!formErrors.name}
+              helperText={formErrors.name}
               InputLabelProps={{
                 style: { color: "#aaa" },
               }}
               InputProps={{
                 style: { color: "white" },
               }}
+              FormHelperTextProps={{
+                style: { color: "#f44336" },
+              }}
             />
             <TextField
               fullWidth
-              label="Company Name"
+              label="Company Name*"
               value={company}
-              onChange={(e) => setCompany(e.target.value)}
+              onChange={(e) => {
+                setCompany(e.target.value);
+                if (e.target.value.trim()) {
+                  setFormErrors((prev) => ({ ...prev, company: "" }));
+                }
+              }}
               margin="normal"
+              error={!!formErrors.company}
+              helperText={formErrors.company}
               InputLabelProps={{
                 style: { color: "#aaa" },
               }}
               InputProps={{
                 style: { color: "white" },
               }}
+              FormHelperTextProps={{
+                style: { color: "#f44336" },
+              }}
             />
             <TextField
               fullWidth
-              label="Contact Number"
+              label="Contact Number*"
               value={contact}
-              onChange={(e) => setContact(e.target.value)}
+              onChange={(e) => {
+                setContact(e.target.value);
+                if (e.target.value && /^\d+$/.test(e.target.value)) {
+                  setFormErrors((prev) => ({ ...prev, contact: "" }));
+                }
+              }}
               margin="normal"
               type="number"
+              error={!!formErrors.contact}
+              helperText={formErrors.contact}
               InputLabelProps={{
                 style: { color: "#aaa" },
               }}
               InputProps={{
                 style: { color: "white" },
+              }}
+              FormHelperTextProps={{
+                style: { color: "#f44336" },
               }}
             />
             <Typography
@@ -590,16 +712,18 @@ const ProviderManagement: React.FC = () => {
             >
               Locations*
             </Typography>
-            {locationError && (
+            {formErrors.locations && (
               <Typography color="error" variant="caption">
-                {locationError}
+                {formErrors.locations}
               </Typography>
             )}
             <Box
               sx={{
                 maxHeight: "150px",
                 overflowY: "auto",
-                border: locationError ? "1px solid #f44336" : "1px solid #555",
+                border: formErrors.locations
+                  ? "1px solid #f44336"
+                  : "1px solid #555",
                 borderRadius: 1,
                 p: 1,
               }}
@@ -612,14 +736,14 @@ const ProviderManagement: React.FC = () => {
                   >
                     <input
                       type="checkbox"
-                      id={`location-${location._id}`}
+                      id={`location-edit-${location._id}`}
                       checked={selectedLocations.some(
                         (loc) => loc._id === location._id
                       )}
                       onChange={() => handleLocationChange(location)}
                       style={{ marginRight: "8px" }}
                     />
-                    <label htmlFor={`location-${location._id}`}>
+                    <label htmlFor={`location-edit-${location._id}`}>
                       {location.name}
                     </label>
                   </Box>
