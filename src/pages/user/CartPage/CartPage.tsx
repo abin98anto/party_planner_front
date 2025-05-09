@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import "./CartPage.scss";
@@ -9,6 +7,8 @@ import IAddress from "../../../entities/IAddress";
 import { Pencil, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import AddressModal from "./AddressModal";
 import { Link, useNavigate } from "react-router-dom";
+import useSnackbar from "../../../hooks/useSnackbar";
+import CustomSnackbar from "../../../components/common/CustomSanckbar/CustomSnackbar";
 
 interface Location {
   _id: string;
@@ -96,6 +96,8 @@ const CartPage: React.FC = () => {
   const [orderSuccess, setOrderSuccess] = useState<boolean>(false);
   const navigate = useNavigate();
 
+  const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
+
   useEffect(() => {
     if (userId) {
       fetchAddresses();
@@ -124,7 +126,7 @@ const CartPage: React.FC = () => {
       }
     } catch (error) {
       console.error("Error fetching addresses", error);
-      alert("Failed to load addresses");
+      showSnackbar("Failed to load addresses", "error");
     } finally {
       setIsLoading(false);
     }
@@ -148,7 +150,7 @@ const CartPage: React.FC = () => {
       setIsLoading(true);
       const response = await axiosInstance.delete(`/address/${addressId}`);
       if (response.status === 204) {
-        alert("Address deleted successfully");
+        showSnackbar("Address deleted successfully", "success");
         setAddresses(addresses.filter((addr) => addr._id !== addressId));
 
         if (selectedAddressId === addressId) {
@@ -158,7 +160,7 @@ const CartPage: React.FC = () => {
       }
     } catch (error) {
       console.error("Error deleting address", error);
-      alert("Failed to delete address");
+      showSnackbar("Failed to delete address", "error");
     } finally {
       setIsLoading(false);
     }
@@ -174,7 +176,7 @@ const CartPage: React.FC = () => {
         });
 
         if (response.data.success) {
-          alert("Address updated successfully");
+          showSnackbar("Address updated successfully", "success");
           const updatedAddresses = addresses.map((addr) =>
             addr._id === selectedAddress._id
               ? { ...addressData, _id: selectedAddress._id }
@@ -201,7 +203,7 @@ const CartPage: React.FC = () => {
         });
 
         if (response.data.success) {
-          alert("Address added successfully");
+          showSnackbar("Address added successfully", "success");
           const newAddress = response.data.data;
           setAddresses([...addresses, newAddress]);
 
@@ -219,7 +221,7 @@ const CartPage: React.FC = () => {
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error saving address", error);
-      alert("Failed to save address");
+      showSnackbar("Failed to save address", "error");
     } finally {
       setIsLoading(false);
     }
@@ -282,12 +284,12 @@ const CartPage: React.FC = () => {
   const handlePlaceOrder = async (): Promise<void> => {
     try {
       if (!address.trim()) {
-        alert("Please select a shipping address");
+        showSnackbar("Please select a shipping address", "error");
         return;
       }
 
       if (!userId) {
-        alert("Please login first");
+        showSnackbar("Please login first", "error");
         return;
       }
 
@@ -319,7 +321,7 @@ const CartPage: React.FC = () => {
       }
     } catch (err) {
       console.error("Error placing order:", err);
-      alert("Failed to place order. Please try again.");
+      showSnackbar("Failed to place order. Please try again.", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -508,6 +510,14 @@ const CartPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Add CustomSnackbar */}
+      <CustomSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={hideSnackbar}
+      />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import IAddress from "../../../entities/IAddress";
+import "./AddressModal.scss";
 
 interface AddressModalProps {
   isOpen: boolean;
@@ -41,7 +42,6 @@ const AddressModal: React.FC<AddressModalProps> = ({
 
   useEffect(() => {
     if (address) {
-      console.log("the address", address);
       setFormData({
         ...address,
         pincode: address.pincode || 0,
@@ -106,17 +106,17 @@ const AddressModal: React.FC<AddressModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-container">
-        <div className="modal-header">
+    <div className="add-mod-overlay">
+      <div className="add-mod-container">
+        <div className="add-mod-header">
           <h2>{address ? "Edit Address" : "Add New Address"}</h2>
-          <button className="close-btn" onClick={onClose}>
+          <button className="add-mod-close-btn" onClick={onClose}>
             <X size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="address-form">
-          <div className="form-group">
+        <form onSubmit={handleSubmit} className="add-mod-address-form">
+          <div className="add-mod-form-group">
             <label htmlFor="venue">Venue/House Name/Number *</label>
             <input
               type="text"
@@ -126,10 +126,12 @@ const AddressModal: React.FC<AddressModalProps> = ({
               onChange={handleChange}
               placeholder="Enter venue or house name/number"
             />
-            {errors.venue && <span className="error-msg">{errors.venue}</span>}
+            {errors.venue && (
+              <span className="add-mod-error-msg">{errors.venue}</span>
+            )}
           </div>
 
-          <div className="form-group">
+          <div className="add-mod-form-group">
             <label htmlFor="place">Place/Street *</label>
             <input
               type="text"
@@ -139,10 +141,12 @@ const AddressModal: React.FC<AddressModalProps> = ({
               onChange={handleChange}
               placeholder="Enter place or street"
             />
-            {errors.place && <span className="error-msg">{errors.place}</span>}
+            {errors.place && (
+              <span className="add-mod-error-msg">{errors.place}</span>
+            )}
           </div>
 
-          <div className="form-group">
+          <div className="add-mod-form-group">
             <label htmlFor="landmark">Landmark (Optional)</label>
             <input
               type="text"
@@ -154,8 +158,8 @@ const AddressModal: React.FC<AddressModalProps> = ({
             />
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
+          <div className="add-mod-form-row">
+            <div className="add-mod-form-group">
               <label htmlFor="city">City *</label>
               <input
                 type="text"
@@ -165,10 +169,12 @@ const AddressModal: React.FC<AddressModalProps> = ({
                 onChange={handleChange}
                 placeholder="Enter city"
               />
-              {errors.city && <span className="error-msg">{errors.city}</span>}
+              {errors.city && (
+                <span className="add-mod-error-msg">{errors.city}</span>
+              )}
             </div>
 
-            <div className="form-group">
+            <div className="add-mod-form-group">
               <label htmlFor="district">District *</label>
               <input
                 type="text"
@@ -179,13 +185,13 @@ const AddressModal: React.FC<AddressModalProps> = ({
                 placeholder="Enter district"
               />
               {errors.district && (
-                <span className="error-msg">{errors.district}</span>
+                <span className="add-mod-error-msg">{errors.district}</span>
               )}
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
+          <div className="add-mod-form-row">
+            <div className="add-mod-form-group">
               <label htmlFor="state">State *</label>
               <input
                 type="text"
@@ -196,11 +202,11 @@ const AddressModal: React.FC<AddressModalProps> = ({
                 placeholder="Enter state"
               />
               {errors.state && (
-                <span className="error-msg">{errors.state}</span>
+                <span className="add-mod-error-msg">{errors.state}</span>
               )}
             </div>
 
-            <div className="form-group">
+            <div className="add-mod-form-group">
               <label htmlFor="pincode">PIN Code *</label>
               <input
                 type="number"
@@ -212,12 +218,12 @@ const AddressModal: React.FC<AddressModalProps> = ({
                 maxLength={6}
               />
               {errors.pincode && (
-                <span className="error-msg">{errors.pincode}</span>
+                <span className="add-mod-error-msg">{errors.pincode}</span>
               )}
             </div>
           </div>
 
-          <div className="form-group">
+          <div className="add-mod-form-group">
             <label htmlFor="phone">Phone Number *</label>
             <input
               type="number"
@@ -228,14 +234,20 @@ const AddressModal: React.FC<AddressModalProps> = ({
               placeholder="Enter 10-digit phone number"
               maxLength={10}
             />
-            {errors.phone && <span className="error-msg">{errors.phone}</span>}
+            {errors.phone && (
+              <span className="add-mod-error-msg">{errors.phone}</span>
+            )}
           </div>
 
-          <div className="modal-actions">
-            <button type="button" className="cancel-btn" onClick={onClose}>
+          <div className="add-mod-actions">
+            <button
+              type="button"
+              className="add-mod-cancel-btn"
+              onClick={onClose}
+            >
               Cancel
             </button>
-            <button type="submit" className="save-btn">
+            <button type="submit" className="add-mod-save-btn">
               {address ? "Update" : "Add"} Address
             </button>
           </div>

@@ -1,0 +1,182 @@
+.add-mod-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.add-mod-container {
+  background-color: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  z-index: 1001;
+  animation: add-mod-FadeIn 0.3s ease;
+}
+
+.add-mod-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #fff;
+  border-radius: 8px 8px 0 0;
+
+  h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .add-mod-close-btn {
+    background: none;
+    border: none;
+    color: #777;
+    cursor: pointer;
+    padding: 0.3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, color 0.2s;
+
+    &:hover {
+      background-color: #e0e0e0;
+      color: #333;
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.add-mod-address-form {
+  padding: 1rem 1.5rem;
+
+  .add-mod-form-group {
+    margin-bottom: 1rem;
+
+    label {
+      display: block !important;
+      margin-bottom: 0.3rem;
+      font-weight: 500;
+      color: #333;
+      font-size: 0.9rem;
+      line-height: 1.2;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      transition: border-color 0.3s;
+      box-sizing: border-box;
+
+      &:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+      }
+
+      &[type="number"] {
+        -moz-appearance: textfield;
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+      }
+
+      &::placeholder {
+        color: #aaa;
+      }
+    }
+
+    .add-mod-error-msg {
+      display: block;
+      color: #e74c3c;
+      font-size: 0.8rem;
+      margin-top: 0.3rem;
+    }
+  }
+
+  .add-mod-form-row {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .add-mod-form-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+  }
+
+  .add-mod-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.8rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e0e0e0;
+
+    button {
+      padding: 0.6rem 1.2rem;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .add-mod-cancel-btn {
+      background-color: #fff;
+      color: #555;
+      border: 1px solid #ccc;
+
+      &:hover {
+        background-color: #f5f5f5;
+      }
+    }
+
+    .add-mod-save-btn {
+      background-color: #3498db;
+      color: white;
+      border: none;
+
+      &:hover {
+        background-color: #2980b9;
+      }
+    }
+  }
+}
+
+@keyframes add-mod-FadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
