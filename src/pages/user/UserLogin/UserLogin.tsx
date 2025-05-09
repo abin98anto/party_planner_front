@@ -3,36 +3,39 @@ import { Link, useNavigate } from "react-router-dom";
 import "./UserLogin.scss";
 import { useAppDispatch } from "../../../hooks/reduxHooks";
 import { login } from "../../../redux/thunks/UserAuthServices";
+import useSnackbar from "../../../hooks/useSnackbar";
+import CustomSnackbar from "../../../components/common/CustomSanckbar/CustomSnackbar";
 
 const UserLogin: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(
     {}
   );
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
-
-    // Email validation
-    if (!email) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-
-    // Password validation
-    if (!password) {
-      newErrors.password = "Password is required";
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters long";
-    }
+    if (!email) newErrors.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      newErrors.email = "Invalid email address";
+    if (!password) newErrors.password = "Password is required";
+    else if (password.length < 6)
+      newErrors.password = "Password must be 6+ characters";
 
     setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      showSnackbar(
+        (newErrors.email as string) || (newErrors.password as string),
+        "error"
+      );
+    }
     return Object.keys(newErrors).length === 0;
   };
+
   const resetForm = () => {
     setEmail("");
     setPassword("");
@@ -42,58 +45,78 @@ const UserLogin: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      const response = await dispatch(
-        login({ email, password, role: "user" })
-      ).unwrap();
-
-      if (response.success === true) {
-        navigate("/");
-        resetForm();
+      setIsLoading(true);
+      try {
+        const response = await dispatch(
+          login({ email, password, role: "user" })
+        ).unwrap();
+        if (response.success) {
+          navigate("/");
+          resetForm();
+        }
+      } catch (error: any) {
+        showSnackbar(error.message || "Invalid credentials", "error");
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <h2 className="login-title">Login</h2>
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
+    <div className="user-login-container">
+      <div className="user-login-card">
+        <h2 className="user-login-title">Login</h2>
+        <form onSubmit={handleSubmit} className="user-login-form">
+          <div className="user-login-form-group">
             <input
               type="text"
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={errors.email ? "input-error" : ""}
-              placeholder="Enter your email"
+              className={errors.email ? "user-login-input-error" : ""}
+              placeholder=" "
             />
-            {errors.email && (
-              <span className="error-message">{errors.email}</span>
-            )}
+            <label
+              htmlFor="email"
+              className={email ? "user-login-label-filled" : ""}
+            >
+              Email
+            </label>
           </div>
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
+          <div className="user-login-form-group">
             <input
               type="password"
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={errors.password ? "input-error" : ""}
-              placeholder="Enter your password"
+              className={errors.password ? "user-login-input-error" : ""}
+              placeholder=" "
             />
-            {errors.password && (
-              <span className="error-message">{errors.password}</span>
-            )}
+            <label
+              htmlFor="password"
+              className={password ? "user-login-label-filled" : ""}
+            >
+              Password
+            </label>
           </div>
-          <button type="submit" className="login-button">
-            Login
+          <button
+            type="submit"
+            className="user-login-button"
+            disabled={isLoading}
+          >
+            {isLoading ? <span className="user-login-spinner"></span> : "Login"}
           </button>
         </form>
-        <p className="signup-link">
+        <p className="user-login-signup-link">
           Don't have an account? <Link to="/signup">Sign Up</Link>
         </p>
       </div>
+      <CustomSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={hideSnackbar}
+      />
     </div>
   );
 };

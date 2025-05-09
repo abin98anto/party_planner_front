@@ -1,13 +1,17 @@
 // Color palette
 $primary: #4f46e5; // Vibrant indigo
-$primary-dark: #3730a3;
+$primary-hover: #3730a3; // Predefined hover for primary
 $background: #f3f4f6;
 $card-bg: #ffffff;
 $text: #111827;
 $text-secondary: #6b7280;
 $error: #ef4444;
+$error-hover: #dc2626; // Predefined hover for error
 $border: #d1d5db;
 $success: #22c55e;
+$success-hover: #16a34a; // Predefined hover for success
+$success-disabled: #6ee7b7; // Predefined disabled for success
+$border-hover: #9ca3af; // Predefined hover for border
 
 // Animations
 @keyframes fadeIn {
@@ -29,7 +33,7 @@ $success: #22c55e;
 
 .prod-mgmt-add-product {
   min-height: 100vh;
-  background: #22242a;
+  background: #22242a; // Dark theme background
   padding: 2rem 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
@@ -183,7 +187,7 @@ $success: #22c55e;
   margin-bottom: 1rem;
 
   &:hover:not(:disabled) {
-    background: $primary-dark;
+    background: $primary-hover;
     transform: translateY(-1px);
   }
 
@@ -234,7 +238,7 @@ $success: #22c55e;
 
   &:hover {
     background: white;
-    color: darken($error, 10%);
+    color: $error-hover;
   }
 }
 
@@ -254,7 +258,7 @@ $success: #22c55e;
   transition: all 0.2s;
 
   &:hover {
-    background: $primary-dark;
+    background: $primary-hover;
   }
 }
 
@@ -313,7 +317,7 @@ $success: #22c55e;
 
   &:hover {
     background: white;
-    color: $primary-dark;
+    color: $primary-hover;
   }
 }
 
@@ -342,7 +346,7 @@ $success: #22c55e;
 
   &:hover {
     background: #f7fafc;
-    border-color: darken($border, 10%);
+    border-color: $border-hover;
   }
 }
 
@@ -353,12 +357,12 @@ $success: #22c55e;
   position: relative;
 
   &:hover:not(:disabled) {
-    background: darken($success, 10%);
+    background: $success-hover;
     transform: translateY(-1px);
   }
 
   &:disabled {
-    background: lighten($success, 20%);
+    background: $success-disabled;
     cursor: not-allowed;
   }
 }
