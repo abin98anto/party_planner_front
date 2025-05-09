@@ -1,5 +1,4 @@
-// Color palette
-$primary: #a855f7; // Vibrant purple
+$primary: #a855f7;
 $primary-dark: #9333ea;
 $background: #1f2937;
 $card-bg: #2d3748;
@@ -8,7 +7,6 @@ $text-secondary: #9ca3af;
 $error: #f87171;
 $border: #4b5563;
 
-// Animations
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -31,7 +29,7 @@ $border: #4b5563;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #1e1b4b 0%, $background 100%);
+  background: linear-gradient(180deg, #030303 0%, $background 100%);
   padding: 1rem;
 }
 

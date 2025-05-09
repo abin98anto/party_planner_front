@@ -2,12 +2,15 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./UserSignup.scss";
 import axiosInstance from "../../../config/axiosConfig";
+import CustomSnackbar from "../../../components/common/CustomSanckbar/CustomSnackbar";
+import useSnackbar from "../../../hooks/useSnackbar";
 
 const UserSignup: React.FC = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{
     fullName?: string;
     email?: string;
@@ -15,6 +18,7 @@ const UserSignup: React.FC = () => {
     confirmPassword?: string;
   }>({});
   const navigate = useNavigate();
+  const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
 
   const validateForm = () => {
     const newErrors: {
@@ -23,38 +27,33 @@ const UserSignup: React.FC = () => {
       password?: string;
       confirmPassword?: string;
     } = {};
-
-    // Full Name validation
-    if (!fullName) {
-      newErrors.fullName = "Full name is required";
-    } else if (fullName.length < 2) {
-      newErrors.fullName = "Full name must be at least 2 characters long";
-    }
-
-    // Email validation
-    if (!email) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-
-    // Password validation
-    if (!password) {
-      newErrors.password = "Password is required";
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters long";
-    }
-
-    // Confirm Password validation
-    if (!confirmPassword) {
+    if (!fullName) newErrors.fullName = "Full name is required";
+    else if (fullName.length < 2)
+      newErrors.fullName = "Full name must be 2+ characters";
+    if (!email) newErrors.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      newErrors.email = "Invalid email address";
+    if (!password) newErrors.password = "Password is required";
+    else if (password.length < 6)
+      newErrors.password = "Password must be 6+ characters";
+    if (!confirmPassword)
       newErrors.confirmPassword = "Please confirm your password";
-    } else if (confirmPassword !== password) {
+    else if (confirmPassword !== password)
       newErrors.confirmPassword = "Passwords do not match";
-    }
 
     setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      showSnackbar(
+        newErrors.fullName as string||
+          newErrors.email as string||
+          newErrors.password as string||
+          newErrors.confirmPassword as string,
+        "error"
+      );
+    }
     return Object.keys(newErrors).length === 0;
   };
+
   const resetForm = () => {
     setFullName("");
     setEmail("");
@@ -66,85 +65,119 @@ const UserSignup: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      const userData = { name: fullName, email, password };
-      const response = await axiosInstance.post("/signup", userData);
-
-      if (response.data.success) {
-        resetForm();
-        navigate("/login");
+      setIsLoading(true);
+      try {
+        const userData = { name: fullName, email, password };
+        const response = await axiosInstance.post("/signup", userData);
+        if (response.data.success) {
+          showSnackbar("Signup successful! Please log in.", "success");
+          resetForm();
+          navigate("/login");
+        }
+      } catch (error: any) {
+        showSnackbar(
+          error.response?.data?.message || "Signup failed. Please try again.",
+          "error"
+        );
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
   return (
-    <div className="signup-container">
-      <div className="signup-card">
-        <h2 className="signup-title">Sign Up</h2>
-        <form onSubmit={handleSubmit} className="signup-form">
-          <div className="form-group">
-            <label htmlFor="fullName">Full Name</label>
+    <div className="user-signup-container">
+      <div className="user-signup-card">
+        <h2 className="user-signup-title">Sign Up</h2>
+        <form onSubmit={handleSubmit} className="user-signup-form">
+          <div className="user-signup-form-group">
             <input
               type="text"
               id="fullName"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className={errors.fullName ? "input-error" : ""}
-              placeholder="Enter your full name"
+              className={errors.fullName ? "user-signup-input-error" : ""}
+              placeholder=" "
             />
-            {errors.fullName && (
-              <span className="error-message">{errors.fullName}</span>
-            )}
+            <label
+              htmlFor="fullName"
+              className={fullName ? "user-signup-label-filled" : ""}
+            >
+              Full Name
+            </label>
           </div>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
+          <div className="user-signup-form-group">
             <input
               type="text"
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={errors.email ? "input-error" : ""}
-              placeholder="Enter your email"
+              className={errors.email ? "user-signup-input-error" : ""}
+              placeholder=" "
             />
-            {errors.email && (
-              <span className="error-message">{errors.email}</span>
-            )}
+            <label
+              htmlFor="email"
+              className={email ? "user-signup-label-filled" : ""}
+            >
+              Email
+            </label>
           </div>
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
+          <div className="user-signup-form-group">
             <input
               type="password"
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={errors.password ? "input-error" : ""}
-              placeholder="Enter your password"
+              className={errors.password ? "user-signup-input-error" : ""}
+              placeholder=" "
             />
-            {errors.password && (
-              <span className="error-message">{errors.password}</span>
-            )}
+            <label
+              htmlFor="password"
+              className={password ? "user-signup-label-filled" : ""}
+            >
+              Password
+            </label>
           </div>
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
+          <div className="user-signup-form-group">
             <input
               type="password"
               id="confirmPassword"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className={errors.confirmPassword ? "input-error" : ""}
-              placeholder="Confirm your password"
+              className={
+                errors.confirmPassword ? "user-signup-input-error" : ""
+              }
+              placeholder=" "
             />
-            {errors.confirmPassword && (
-              <span className="error-message">{errors.confirmPassword}</span>
-            )}
+            <label
+              htmlFor="confirmPassword"
+              className={confirmPassword ? "user-signup-label-filled" : ""}
+            >
+              Confirm Password
+            </label>
           </div>
-          <button type="submit" className="signup-button">
-            Sign Up
+          <button
+            type="submit"
+            className="user-signup-button"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <span className="user-signup-spinner"></span>
+            ) : (
+              "Sign Up"
+            )}
           </button>
         </form>
-        <p className="login-link">
+        <p className="user-signup-login-link">
           Already have an account? <Link to="/login">Login</Link>
         </p>
       </div>
+      <CustomSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={hideSnackbar}
+      />
     </div>
   );
 };
