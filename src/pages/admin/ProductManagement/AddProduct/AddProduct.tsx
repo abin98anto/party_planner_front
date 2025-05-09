@@ -1,6 +1,5 @@
-import type React from "react";
-import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../../../config/axiosConfig";
 import handleFileUpload, {
   validateImageFile,
@@ -10,6 +9,8 @@ import type IProvider from "../../../../entities/IProvider";
 import type IProduct from "../../../../entities/IProduct";
 import Calendar from "./calender";
 import "./AddProduct.scss";
+import useSnackbar from "../../../../hooks/useSnackbar";
+import CustomSnackbar from "../../../../components/common/CustomSanckbar/CustomSnackbar";
 
 interface ValidationErrors {
   name?: string;
@@ -22,8 +23,10 @@ interface ValidationErrors {
 }
 
 const AddProduct: React.FC = () => {
-  const { productId } = useParams();
+  const { state } = useLocation();
+  const productId = state?.productId;
   const navigate = useNavigate();
+  const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [providers, setProviders] = useState<IProvider[]>([]);
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -50,10 +53,7 @@ const AddProduct: React.FC = () => {
   useEffect(() => {
     fetchCategories();
     fetchProviders();
-
-    if (productId) {
-      fetchProductDetails(productId);
-    }
+    if (productId) fetchProductDetails(productId);
 
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -63,48 +63,41 @@ const AddProduct: React.FC = () => {
         setShowCalendar(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [productId]);
 
   const fetchProductDetails = async (id: string): Promise<void> => {
     try {
       const response = await axiosInstance.get(`/product/${id}`);
       const productData = response.data.data;
-
       const categoryId = productData.categoryId?._id || productData.categoryId;
       const providerId = productData.providerId?._id || productData.providerId;
-
-      setProductForm({
-        ...productData,
-        categoryId,
-        providerId,
-      });
+      setProductForm({ ...productData, categoryId, providerId });
     } catch (error) {
-      console.error("Error fetching product details:", error);
+      showSnackbar("Error fetching product details", "error");
     }
   };
 
   const fetchCategories = async (): Promise<void> => {
     try {
       const response = await axiosInstance.get("/category");
-      const data: ICategory[] = await response.data.data;
-      setCategories(data.filter((category) => category.isActive));
+      setCategories(
+        response.data.data.filter((category: ICategory) => category.isActive)
+      );
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      showSnackbar("Error fetching categories", "error");
     }
   };
 
   const fetchProviders = async (): Promise<void> => {
     try {
       const response = await axiosInstance.get("/provider");
-      const data: IProvider[] = await response.data.data;
-      setProviders(data.filter((provider) => provider.isActive));
+      setProviders(
+        response.data.data.filter((provider: IProvider) => provider.isActive)
+      );
     } catch (error) {
-      console.error("Error fetching providers:", error);
+      showSnackbar("Error fetching providers", "error");
     }
   };
 
@@ -117,35 +110,26 @@ const AddProduct: React.FC = () => {
         if (value.trim().length > 100)
           return "Name must be less than 100 characters";
         return undefined;
-
       case "description":
         if (!value.trim()) return "Description is required";
         if (value.length > 1000)
           return "Description must be less than 1000 characters";
         return undefined;
-
       case "categoryId":
         if (!value) return "Category is required";
         return undefined;
-
       case "providerId":
         if (!value) return "Service provider is required";
         return undefined;
-
       case "price":
         if (value === undefined || value === null || value === "")
           return "Price is required";
         if (isNaN(Number(value)) || Number(value) <= 0)
           return "Price must be a positive number";
         return undefined;
-
       case "images":
         if (value.length === 0) return "At least one image is required";
         return undefined;
-
-      case "datesAvailable":
-        return undefined;
-
       default:
         return undefined;
     }
@@ -153,18 +137,24 @@ const AddProduct: React.FC = () => {
 
   const validateForm = (): boolean => {
     const newErrors: ValidationErrors = {};
-    let isValid = true;
-
     Object.entries(productForm).forEach(([key, value]) => {
       const error = validateField(key, value);
-      if (error) {
-        newErrors[key as keyof ValidationErrors] = error;
-        isValid = false;
-      }
+      if (error) newErrors[key as keyof ValidationErrors] = error;
     });
-
     setErrors(newErrors);
-    return isValid;
+    if (Object.keys(newErrors).length > 0) {
+      showSnackbar(
+        newErrors.name ||
+          newErrors.description ||
+          newErrors.categoryId ||
+          newErrors.providerId ||
+          newErrors.price ||
+          newErrors.images ||
+          "Please fix the errors",
+        "error"
+      );
+    }
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleBlur = (name: string): void => {
@@ -174,6 +164,7 @@ const AddProduct: React.FC = () => {
       productForm[name as keyof typeof productForm]
     );
     setErrors({ ...errors, [name]: error });
+    if (error) showSnackbar(error, "error");
   };
 
   const handleInputChange = (
@@ -182,12 +173,11 @@ const AddProduct: React.FC = () => {
     const { name, value } = e.target;
     const newValue =
       name === "price" ? (value === "" ? "" : Number.parseFloat(value)) : value;
-
     setProductForm({ ...productForm, [name]: newValue });
-
     if (touched[name]) {
       const error = validateField(name, newValue);
       setErrors({ ...errors, [name]: error });
+      if (error) showSnackbar(error, "error");
     }
   };
 
@@ -195,12 +185,11 @@ const AddProduct: React.FC = () => {
     e: React.ChangeEvent<HTMLSelectElement>
   ): void => {
     const { name, value } = e.target;
-
     setProductForm({ ...productForm, [name]: value });
-
     if (touched[name]) {
       const error = validateField(name, value);
       setErrors({ ...errors, [name]: error });
+      if (error) showSnackbar(error, "error");
     }
   };
 
@@ -209,59 +198,36 @@ const AddProduct: React.FC = () => {
   ): Promise<void> => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       if (!validateImageFile(file)) {
-        setErrors({
-          ...errors,
-          images: "Invalid image file. Only JPEG, PNG, and GIF are supported.",
-        });
+        showSnackbar(
+          "Invalid image file. Only JPEG, PNG, and GIF are supported.",
+          "error"
+        );
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
-        setErrors({
-          ...errors,
-          images: "Image size must be less than 5MB",
-        });
+        showSnackbar("Image size must be less than 5MB", "error");
         return;
       }
     }
-
     setIsUploading(true);
-
     try {
       const uploadPromises = Array.from(files).map((file) =>
-        handleFileUpload(file, {
-          validateFile: validateImageFile,
-        })
+        handleFileUpload(file, { validateFile: validateImageFile })
       );
-
       const results = await Promise.all(uploadPromises);
-
       const uploadedUrls = results
         .filter((result) => result.success && result.url)
         .map((result) => result.url as string);
-
       const newImages = [...productForm.images, ...uploadedUrls];
-
-      setProductForm({
-        ...productForm,
-        images: newImages,
-      });
-
+      setProductForm({ ...productForm, images: newImages });
       if (newImages.length > 0 && errors.images) {
-        setErrors({
-          ...errors,
-          images: undefined,
-        });
+        setErrors({ ...errors, images: undefined });
       }
     } catch (error) {
-      console.error("Error uploading images:", error);
-      setErrors({
-        ...errors,
-        images: "Failed to upload images. Please try again.",
-      });
+      showSnackbar("Failed to upload images. Please try again.", "error");
     } finally {
       setIsUploading(false);
     }
@@ -271,25 +237,15 @@ const AddProduct: React.FC = () => {
     const newImages = productForm.images.filter(
       (_, index) => index !== indexToRemove
     );
-
-    setProductForm({
-      ...productForm,
-      images: newImages,
-    });
-
+    setProductForm({ ...productForm, images: newImages });
     if (newImages.length === 0) {
-      setErrors({
-        ...errors,
-        images: "At least one image is required",
-      });
+      showSnackbar("At least one image is required", "error");
+      setErrors({ ...errors, images: "At least one image is required" });
     }
   };
 
   const handleDateSelection = (selectedDates: Date[]): void => {
-    setProductForm({
-      ...productForm,
-      datesAvailable: selectedDates,
-    });
+    setProductForm({ ...productForm, datesAvailable: selectedDates });
     setShowCalendar(false);
   };
 
@@ -308,17 +264,10 @@ const AddProduct: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
-
     const allTouched: Record<string, boolean> = {};
-    Object.keys(productForm).forEach((key) => {
-      allTouched[key] = true;
-    });
+    Object.keys(productForm).forEach((key) => (allTouched[key] = true));
     setTouched(allTouched);
-
-    if (!validateForm()) {
-      return;
-    }
-
+    if (!validateForm()) return;
     setIsSubmitting(true);
     try {
       const productData = { ...productForm };
@@ -327,21 +276,13 @@ const AddProduct: React.FC = () => {
           "/product/update",
           productData
         );
-        if (response.status === 200) {
-          navigate("/admin/product-management");
-        }
+        if (response.status === 200) navigate("/admin/product-management");
       } else {
         const response = await axiosInstance.post("/product/add", productData);
-        if (response.status === 201) {
-          navigate("/admin/product-management");
-        }
+        if (response.status === 201) navigate("/admin/product-management");
       }
     } catch (error) {
-      console.error("Error saving product:", error);
-      setErrors({
-        ...errors,
-        name: "Failed to save product. Please try again.",
-      });
+      showSnackbar("Failed to save product. Please try again.", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -354,17 +295,15 @@ const AddProduct: React.FC = () => {
   };
 
   return (
-    <div className="add-product">
-      <div className="container">
-        <div className="form-container">
-          <h1 className="form-title centered">
+    <div className="prod-mgmt-add-product">
+      <div className="prod-mgmt-container">
+        <div className="prod-mgmt-form-container">
+          <h1 className="prod-mgmt-form-title prod-mgmt-centered">
             {isEditMode ? "Edit Product" : "Add New Product"}
           </h1>
-
-          <form className="form-content" onSubmit={handleSubmit}>
-            <div className="form-row full-width">
-              <div className="form-field">
-                <label htmlFor="name">Product Name*</label>
+          <form className="prod-mgmt-form-content" onSubmit={handleSubmit}>
+            <div className="prod-mgmt-form-row prod-mgmt-full-width">
+              <div className="prod-mgmt-form-field">
                 <input
                   id="name"
                   type="text"
@@ -372,17 +311,19 @@ const AddProduct: React.FC = () => {
                   value={productForm.name}
                   onChange={handleInputChange}
                   onBlur={() => handleBlur("name")}
-                  className={hasError("name") ? "invalid" : ""}
+                  className={hasError("name") ? "prod-mgmt-invalid" : ""}
+                  placeholder=" "
                 />
-                {hasError("name") && (
-                  <div className="validation-error">{errors.name}</div>
-                )}
+                <label
+                  htmlFor="name"
+                  className={productForm.name ? "prod-mgmt-label-filled" : ""}
+                >
+                  Product Name*
+                </label>
               </div>
             </div>
-
-            <div className="form-row full-width">
-              <div className="form-field">
-                <label htmlFor="description">Description</label>
+            <div className="prod-mgmt-form-row prod-mgmt-full-width">
+              <div className="prod-mgmt-form-field">
                 <textarea
                   id="description"
                   name="description"
@@ -390,24 +331,28 @@ const AddProduct: React.FC = () => {
                   value={productForm.description}
                   onChange={handleInputChange}
                   onBlur={() => handleBlur("description")}
-                  className={hasError("description") ? "invalid" : ""}
+                  className={hasError("description") ? "prod-mgmt-invalid" : ""}
+                  placeholder=" "
                 />
-                {hasError("description") && (
-                  <div className="validation-error">{errors.description}</div>
-                )}
+                <label
+                  htmlFor="description"
+                  className={
+                    productForm.description ? "prod-mgmt-label-filled" : ""
+                  }
+                >
+                  Description*
+                </label>
               </div>
             </div>
-
-            <div className="form-row three-col">
-              <div className="form-field">
-                <label htmlFor="categoryId">Category*</label>
+            <div className="prod-mgmt-form-row prod-mgmt-three-col">
+              <div className="prod-mgmt-form-field">
                 <select
                   id="categoryId"
                   name="categoryId"
                   value={productForm.categoryId}
                   onChange={handleSelectChange}
                   onBlur={() => handleBlur("categoryId")}
-                  className={hasError("categoryId") ? "invalid" : ""}
+                  className={hasError("categoryId") ? "prod-mgmt-invalid" : ""}
                 >
                   <option value="">Select a category</option>
                   {categories.map((category) => (
@@ -416,20 +361,23 @@ const AddProduct: React.FC = () => {
                     </option>
                   ))}
                 </select>
-                {hasError("categoryId") && (
-                  <div className="validation-error">{errors.categoryId}</div>
-                )}
+                <label
+                  htmlFor="categoryId"
+                  className={
+                    productForm.categoryId ? "prod-mgmt-label-filled" : ""
+                  }
+                >
+                  Category*
+                </label>
               </div>
-
-              <div className="form-field">
-                <label htmlFor="providerId">Service Provider</label>
+              <div className="prod-mgmt-form-field">
                 <select
                   id="providerId"
                   name="providerId"
                   value={productForm.providerId}
                   onChange={handleSelectChange}
                   onBlur={() => handleBlur("providerId")}
-                  className={hasError("providerId") ? "invalid" : ""}
+                  className={hasError("providerId") ? "prod-mgmt-invalid" : ""}
                 >
                   <option value="">Select a provider</option>
                   {providers.map((provider) => (
@@ -438,42 +386,52 @@ const AddProduct: React.FC = () => {
                     </option>
                   ))}
                 </select>
-                {hasError("providerId") && (
-                  <div className="validation-error">{errors.providerId}</div>
-                )}
+                <label
+                  htmlFor="providerId"
+                  className={
+                    productForm.providerId ? "prod-mgmt-label-filled" : ""
+                  }
+                >
+                  Service Provider*
+                </label>
               </div>
-
-              <div className="form-field">
-                <label htmlFor="price">Price*</label>
+              <div className="prod-mgmt-form-field">
                 <input
                   id="price"
                   name="price"
+                  type="number"
                   value={productForm.price}
                   onChange={handleInputChange}
                   onBlur={() => handleBlur("price")}
-                  className={hasError("price") ? "invalid" : ""}
+                  className={hasError("price") ? "prod-mgmt-invalid" : ""}
                   min="0"
                   step="0.01"
+                  placeholder=" "
                 />
-                {hasError("price") && (
-                  <div className="validation-error">{errors.price}</div>
-                )}
+                <label
+                  htmlFor="price"
+                  className={productForm.price ? "prod-mgmt-label-filled" : ""}
+                >
+                  Price*
+                </label>
               </div>
             </div>
-
-            <div className="form-row full-width">
-              <div className="section-container">
-                <h2 className="section-title">Images*</h2>
-
+            <div className="prod-mgmt-form-row prod-mgmt-full-width">
+              <div className="prod-mgmt-section-container">
+                <h2 className="prod-mgmt-section-title">Images*</h2>
                 <button
                   type="button"
-                  className="upload-button"
+                  className="prod-mgmt-upload-button"
                   disabled={isUploading}
                   onClick={() =>
                     document.getElementById("image-upload")?.click()
                   }
                 >
-                  {isUploading ? "Uploading..." : "Upload Images"}
+                  {isUploading ? (
+                    <span className="prod-mgmt-spinner"></span>
+                  ) : (
+                    "Upload Images"
+                  )}
                 </button>
                 <input
                   id="image-upload"
@@ -483,22 +441,17 @@ const AddProduct: React.FC = () => {
                   onChange={handleImageUpload}
                   accept="image/jpeg,image/png,image/gif"
                 />
-
-                {errors.images && (
-                  <div className="validation-error">{errors.images}</div>
-                )}
-
-                <div className="image-preview-container">
+                <div className="prod-mgmt-image-preview-container">
                   {productForm.images.map((image, index) => (
-                    <div key={index} className="image-preview-item">
+                    <div key={index} className="prod-mgmt-image-preview-item">
                       <img
                         src={image || "/placeholder.svg"}
                         alt={`Product ${index}`}
-                        className="image-preview"
+                        className="prod-mgmt-image-preview"
                       />
                       <button
                         type="button"
-                        className="image-remove-btn"
+                        className="prod-mgmt-image-remove-btn"
                         onClick={() => handleRemoveImage(index)}
                       >
                         ×
@@ -508,28 +461,25 @@ const AddProduct: React.FC = () => {
                 </div>
               </div>
             </div>
-
-            <div className="form-row full-width">
-              <div className="section-container">
-                <h2 className="section-title">Dates Available</h2>
-
-                <div className="date-picker-container">
+            <div className="prod-mgmt-form-row prod-mgmt-full-width">
+              <div className="prod-mgmt-section-container">
+                <h2 className="prod-mgmt-section-title">Dates Available</h2>
+                <div className="prod-mgmt-date-picker-container">
                   <button
                     type="button"
-                    className="calendar-toggle-button"
+                    className="prod-mgmt-calendar-toggle-button"
                     onClick={() => setShowCalendar(!showCalendar)}
                   >
                     Select Dates
                   </button>
-
                   {showCalendar && (
                     <>
                       <div
-                        className="calendar-overlay"
+                        className="prod-mgmt-calendar-overlay"
                         onClick={() => setShowCalendar(false)}
                       ></div>
                       <div
-                        className="calendar-modal-container"
+                        className="prod-mgmt-calendar-modal-container"
                         ref={calendarRef}
                       >
                         <Calendar
@@ -540,14 +490,13 @@ const AddProduct: React.FC = () => {
                     </>
                   )}
                 </div>
-
-                <div className="date-chips-container">
+                <div className="prod-mgmt-date-chips-container">
                   {productForm.datesAvailable.map((date, index) => (
-                    <div key={index} className="date-chip">
+                    <div key={index} className="prod-mgmt-date-chip">
                       {formatDate(date)}
                       <button
                         type="button"
-                        className="date-remove-btn"
+                        className="prod-mgmt-date-remove-btn"
                         onClick={() => handleRemoveDate(index)}
                       >
                         ×
@@ -557,34 +506,39 @@ const AddProduct: React.FC = () => {
                 </div>
               </div>
             </div>
-
-            <div className="form-row full-width">
-              <div className="form-actions">
+            <div className="prod-mgmt-form-row prod-mgmt-full-width">
+              <div className="prod-mgmt-form-actions">
                 <button
                   type="button"
-                  className="cancel-button"
+                  className="prod-mgmt-cancel-button"
                   onClick={() => navigate("/admin/product-management")}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="submit-button"
+                  className="prod-mgmt-submit-button"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting
-                    ? isEditMode
-                      ? "Updating..."
-                      : "Adding..."
-                    : isEditMode
-                    ? "Update Product"
-                    : "Add Product"}
+                  {isSubmitting ? (
+                    <span className="prod-mgmt-spinner"></span>
+                  ) : isEditMode ? (
+                    "Update Product"
+                  ) : (
+                    "Add Product"
+                  )}
                 </button>
               </div>
             </div>
           </form>
         </div>
       </div>
+      <CustomSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={hideSnackbar}
+      />
     </div>
   );
 };

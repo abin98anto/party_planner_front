@@ -182,7 +182,8 @@ const ProductManagement: React.FC = () => {
   };
 
   const openEditModal = (product: IProduct): void => {
-    navigate(`/admin/edit-product/${product._id}`);
+    const data = { productId: product._id };
+    navigate(`/admin/edit-product`, { state: data });
   };
 
   const openDeleteModal = (product: IProduct): void => {
