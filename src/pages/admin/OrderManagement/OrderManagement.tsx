@@ -17,6 +17,7 @@ import {
   IconButton,
   Pagination,
 } from "@mui/material";
+import IUser from "../../../entities/IUser";
 
 interface Product {
   _id: string;
@@ -39,7 +40,7 @@ interface SelectedProduct {
 
 interface Order {
   _id: string;
-  userId: string;
+  userId: IUser;
   productIds: SelectedProduct[];
   providerIds: string[];
   amount: number;
@@ -264,7 +265,7 @@ const OrderManagement: React.FC = () => {
                   {orders.map((order) => (
                     <tr key={order._id}>
                       <td>{order._id.substring(0, 8)}</td>
-                      <td>{order.userId.substring(0, 8)}</td>
+                      <td>{order.userId.name}</td>
                       <td>{formatDate(order.createdAt)}</td>
                       <td>${order.amount.toFixed(2)}</td>
                       <td>{order.productIds.length}</td>
