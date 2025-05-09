@@ -7,6 +7,8 @@ import ICategory from "../../../entities/ICategory";
 import IProvider from "../../../entities/IProvider";
 import { ISelectedProducts } from "../../../entities/ICart";
 import { useAppSelector } from "../../../hooks/reduxHooks";
+import useSnackbar from "../../../hooks/useSnackbar";
+import CustomSnackbar from "../../../components/common/CustomSanckbar/CustomSnackbar";
 
 interface Product {
   _id: string;
@@ -45,6 +47,8 @@ const ProductDetails: React.FC = () => {
 
   const { userInfo } = useAppSelector((state) => state.user);
   const userId = userInfo?._id;
+
+  const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
 
   useEffect(() => {
     if (productId && userId) {
@@ -103,7 +107,10 @@ const ProductDetails: React.FC = () => {
 
   const checkIfInCart = async () => {
     try {
-      if (!userId) return;
+      if (!userId) {
+        showSnackbar("Please login to purchase items", "error");
+        return;
+      }
 
       const response = await axiosInstance.get(`/cart/user/${userId}`);
       const cart = response.data.data;
@@ -222,6 +229,12 @@ const ProductDetails: React.FC = () => {
 
   const addToCart = async () => {
     try {
+      // Check if user is logged in
+      if (!userId) {
+        showSnackbar("Please login to add the product to cart", "error");
+        return;
+      }
+
       if (!product) return;
 
       if (selectedDates.length === 0) {
@@ -431,6 +444,14 @@ const ProductDetails: React.FC = () => {
             : "Add to Cart"}
         </button>
       </div>
+
+      {/* Add CustomSnackbar */}
+      <CustomSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={hideSnackbar}
+      />
     </div>
   );
 };
