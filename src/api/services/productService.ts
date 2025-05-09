@@ -23,6 +23,19 @@ export const getAllProducts = async (
   }
 };
 
+// export const getUserProducts = async (params) => {
+//   try {
+//     const response = await axiosInstance.get("/product/all-products", {
+//       params,
+//     });
+//     return response.data;
+//   } catch (error: any) {
+//     throw new Error(
+//       error.response?.data?.message || "Failed to fetch products in user side."
+//     );
+//   }
+// };
+
 export const deleteProduct = async (
   productId: string
 ): Promise<DeleteProductResponse> => {
