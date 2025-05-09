@@ -51,9 +51,11 @@ const ProductDetails: React.FC = () => {
   const { snackbar, showSnackbar, hideSnackbar } = useSnackbar();
 
   useEffect(() => {
-    if (productId && userId) {
+    if (productId) {
       fetchProductData();
-      checkIfInCart();
+      if (userId) {
+        checkIfInCart();
+      }
     }
   }, [productId, userId]);
 
@@ -229,7 +231,6 @@ const ProductDetails: React.FC = () => {
 
   const addToCart = async () => {
     try {
-      // Check if user is logged in
       if (!userId) {
         showSnackbar("Please login to add the product to cart", "error");
         return;
